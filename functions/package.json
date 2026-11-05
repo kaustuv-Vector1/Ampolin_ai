@@ -1,0 +1,16 @@
+{
+  "name": "ampolin-ai-functions",
+  "description": "Serverless API for Ampolin AI Agent with Groq & Gemini Cloud Routing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "engines": {
+    "node": "22"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^5.0.0"
+  },
+  "private": true
+}
