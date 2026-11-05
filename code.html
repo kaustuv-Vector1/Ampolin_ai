@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<title>Ampolin Studio — Agentic Workspace</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              black: "#0d0d0d",
+              charcoal: "#18181b",
+              gray: "#71717a",
+              muted: "#a1a1aa",
+              light: "#f4f4f5",
+              border: "#e5e7eb",
+              card: "#ffffff",
+              canvas: "#fcfbf9"
+            }
+          },
+          fontFamily: {
+            sans: ['"Inter"', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          boxShadow: {
+            'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
+            'composer': '0 4px 24px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02)',
+            'card-hover': '0 8px 24px -4px rgba(0, 0, 0, 0.06), 0 4px 8px -2px rgba(0, 0, 0, 0.03)',
+            'dropdown': '0 10px 38px -10px rgba(22, 23, 24, 0.12), 0 10px 20px -15px rgba(22, 23, 24, 0.08)'
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #fcfbf9;
+        color: #0d0d0d;
+        font-family: 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+    }
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e5e7eb;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a1a1aa;
+    }
+    .composer-shadow {
+      box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+    }
+    .composer-shadow:focus-within {
+      box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.07), 0 0 0 1px #0d0d0d;
+    }
+  </style>
+</head>
+<body class="bg-[#fcfbf9] text-brand-black antialiased selection:bg-brand-black selection:text-white">
+<!-- Sidebar Overlay for mobile -->
+<div class="fixed inset-0 bg-black/20 backdrop-blur-xs z-40 hidden transition-opacity lg:hidden" id="sidebar-overlay"></div>
+<!-- Left Sidebar (Claude / ChatGPT style minimalist white & light-gray) -->
+<aside class="fixed left-0 top-0 h-full w-72 bg-white border-r border-gray-200 z-50 flex flex-col justify-between transition-transform duration-300 ease-out select-none" id="sidebar">
+<div class="flex flex-col flex-1 min-h-0">
+<!-- App Header & Logo -->
+<div class="p-4 flex items-center justify-between border-b border-gray-100">
+<a class="flex items-center gap-2.5 group" href="#">
+<div class="w-7 h-7 flex items-center justify-center overflow-hidden flex-shrink-0 group-hover:opacity-80 transition-opacity">
+<img alt="Ampolin Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJ2FCNkXX9weTTmX6zmY3zUlrKAxr1EVwvfy2k4btGty6mwYTsKWnrUgyygcnEb7SEE0mX7suWuwB6aRDbq_bIIIOgY5CzwgDnOPo5kwi5rUrLBtFNRdaRdq-69esFJHLV-8eR2cKON6n7qWMKKGnt_oSt78nFGpz4sJi0py33uB0ZtnxC3o4HtmYizvzsifZtdsam2rikTZEaoCm_M1BTNg6HdtzdIUShmDTL0EHYnRCACgDDyrJ3"/>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="font-display font-extrabold text-[17px] tracking-tight text-neutral-900">Ampolin</span>
+<span class="text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-neutral-100 text-neutral-600 font-semibold border border-neutral-200/60">STUDIO</span>
+</div>
+</a>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors" id="sidebar-toggle-btn" title="Toggle Sidebar (⌘/)">
+<span class="material-symbols-outlined text-lg">dock_to_left</span>
+</button>
+</div>
+<!-- Action: New Chat & Search -->
+<div class="p-3 space-y-2">
+<button class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white hover:border-neutral-900 hover:shadow-xs text-neutral-900 transition-all group" id="btn-new-chat">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-lg text-neutral-800 group-hover:rotate-90 transition-transform duration-200">add</span>
+<span class="font-display text-sm font-semibold">New chat</span>
+</div>
+<span class="text-[11px] font-mono text-neutral-400 px-1.5 py-0.5 rounded bg-neutral-50 border border-neutral-200/60">⌘K</span>
+</button>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-neutral-400 text-base pointer-events-none">search</span>
+<input class="w-full bg-neutral-50/80 hover:bg-neutral-100/70 focus:bg-white rounded-lg pl-9 pr-3 py-1.5 text-xs text-neutral-800 placeholder:text-neutral-400 border border-transparent focus:border-neutral-300 focus:outline-none transition-colors" id="chat-search" placeholder="Search conversations..." type="text"/>
+</div>
+</div>
+<!-- Workspaces & History Lists -->
+<div class="flex-1 overflow-y-auto px-3 py-1 space-y-5 text-xs">
+<!-- Workspaces -->
+<div class="space-y-1">
+<div class="px-2 py-1 flex items-center justify-between text-[11px] font-semibold tracking-wider uppercase text-neutral-400">
+<span>Workspaces</span>
+<span class="material-symbols-outlined text-sm cursor-pointer hover:text-neutral-800">add</span>
+</div>
+<nav class="space-y-0.5">
+<a class="workspace-nav-item flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/80 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[17px] text-neutral-400 group-hover:text-black">folder</span>
+<span class="font-medium text-xs truncate">Research &amp; Strategy</span>
+</a>
+<a class="workspace-nav-item flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/80 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[17px] text-neutral-400 group-hover:text-black">terminal</span>
+<span class="font-medium text-xs truncate">Engineering Core</span>
+</a>
+<a class="workspace-nav-item flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/80 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[17px] text-neutral-400 group-hover:text-black">hub</span>
+<span class="font-medium text-xs truncate">Autonomous Agents</span>
+</a>
+</nav>
+</div>
+<!-- Today -->
+<div class="space-y-1">
+<div class="px-2 py-1 text-[11px] font-semibold tracking-wider uppercase text-neutral-400">
+            Today
+          </div>
+<nav class="space-y-0.5" id="history-today">
+<a class="chat-history-item active flex items-center justify-between px-2.5 py-2 rounded-lg bg-neutral-100 text-neutral-900 font-medium transition-colors group" href="#">
+<span class="truncate">Ampolin Opus reasoning benchmark</span>
+<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
+</a>
+<a class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors group" href="#">
+<span class="truncate">Substrate architecture review</span>
+<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
+</a>
+</nav>
+</div>
+<!-- Yesterday -->
+<div class="space-y-1">
+<div class="px-2 py-1 text-[11px] font-semibold tracking-wider uppercase text-neutral-400">
+            Yesterday
+          </div>
+<nav class="space-y-0.5">
+<a class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors group" href="#">
+<span class="truncate">Distributed KV store schema design</span>
+<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
+</a>
+<a class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors group" href="#">
+<span class="truncate">Tailwind semantic tokens refactoring</span>
+<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
+</a>
+</nav>
+</div>
+<!-- Previous 7 Days -->
+<div class="space-y-1">
+<div class="px-2 py-1 text-[11px] font-semibold tracking-wider uppercase text-neutral-400">
+            Previous 7 Days
+          </div>
+<nav class="space-y-0.5">
+<a class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors group" href="#">
+<span class="truncate">Vector search similarity indices</span>
+<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
+</a>
+<a class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors group" href="#">
+<span class="truncate">Claude Sonnet prompt synthesis</span>
+<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+<!-- Sidebar Footer -->
+<div class="p-3 border-t border-gray-100 bg-white space-y-2">
+<div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-neutral-50 border border-gray-200/70 text-xs">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-mono text-[11px] text-neutral-700">Cluster: us-east-prod</span>
+</div>
+<span class="text-[10px] font-mono text-neutral-400 font-medium">99.9%</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-neutral-100 cursor-pointer flex-1 min-w-0 transition-colors">
+<img alt="Profile" class="w-8 h-8 rounded-full border border-gray-200 object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1VoLoAFSyUZXXi_rU0yqqTXjM00fvYiNvleLuY3UGUPLO9tVuVITtlmtQA61TgrJVjkRiYBWGpX49seMkyv5Vazp8ihC-FNGPAv8rgOZRw9MO6gJDXJSUe162keO64yZebiCwYVpiFnjH3fg5N7B0RHW620ZLNkLtmG3SjT-GK-nbph5g8xrMJpMy3aaYJKnVjWV1OLc0yVKyY3Jc_wrw_ZEK2zG7kxijSZWxJfqcrE"/>
+<div class="flex flex-col min-w-0">
+<span class="font-display font-semibold text-xs text-neutral-900 truncate">Principal Architect</span>
+<span class="text-[10px] text-neutral-500 font-medium truncate">Enterprise Pro Tier</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors" title="Settings">
+<span class="material-symbols-outlined text-lg">tune</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Shell (Padded for left sidebar) -->
+<div class="pl-0 lg:pl-72 transition-all duration-300" id="main-container">
+<!-- Top Minimalist Glass Header -->
+<header class="sticky top-0 z-30 h-14 bg-white/90 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-4 sm:px-6">
+<!-- Left: Mobile menu toggle + Model selector dropdown -->
+<div class="flex items-center gap-3">
+<button class="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-neutral-700 hover:bg-neutral-100" id="mobile-sidebar-btn">
+<span class="material-symbols-outlined text-xl">menu</span>
+</button>
+<!-- Model Selector Pill with Dropdown -->
+<div class="relative">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 transition-all text-xs text-neutral-800 font-medium shadow-2xs group" id="model-selector-btn">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="font-display font-semibold text-neutral-900" id="current-model-label">Ampolin Opus 3.5</span>
+<span class="text-[10px] font-mono text-neutral-400 px-1.5 py-0.5 rounded bg-neutral-100">200k</span>
+<span class="material-symbols-outlined text-sm text-neutral-400 group-hover:text-neutral-800 transition-transform" id="model-chevron">keyboard_arrow_down</span>
+</button>
+<!-- Dropdown Menu -->
+<div class="hidden absolute left-0 mt-2 w-64 bg-white rounded-2xl border border-gray-200 shadow-dropdown p-1.5 z-50 text-xs transition-all" id="model-dropdown-menu">
+<div class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Available Foundations</div>
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl bg-neutral-50 text-neutral-900 font-medium hover:bg-neutral-100 text-left transition-colors" data-model="Ampolin Opus 3.5" data-tokens="200k">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<div>
+<div class="font-semibold text-neutral-900">Ampolin Opus 3.5</div>
+<div class="text-[10px] text-neutral-500">Autonomous reasoning leader</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-sm text-neutral-900 font-bold">check</span>
+</button>
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="Claude 3.5 Sonnet" data-tokens="200k">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-neutral-400"></span>
+<div>
+<div class="font-medium text-neutral-800">Claude 3.5 Sonnet</div>
+<div class="text-[10px] text-neutral-500">Superior coding &amp; nuanced tone</div>
+</div>
+</div>
+</button>
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="GPT-4o Omniverse" data-tokens="128k">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-neutral-400"></span>
+<div>
+<div class="font-medium text-neutral-800">GPT-4o Omniverse</div>
+<div class="text-[10px] text-neutral-500">High speed multi-modal inference</div>
+</div>
+</div>
+</button>
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="DeepSeek R1 Sovereign" data-tokens="64k">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-neutral-400"></span>
+<div>
+<div class="font-medium text-neutral-800">DeepSeek R1 Sovereign</div>
+<div class="text-[10px] text-neutral-500">Pure chain-of-thought logic</div>
+</div>
+</div>
+</button>
+</div>
+</div>
+</div>
+<!-- Center / Right: Tabs & Actions -->
+<div class="flex items-center gap-4">
+<!-- Minimal Nav Tabs -->
+<nav class="hidden md:flex items-center space-x-1" id="nav-tabs">
+<button class="tab-btn px-3 py-1.5 text-xs font-semibold text-neutral-900 border-b-2 border-black transition-colors" data-tab="console">Console</button>
+<button class="tab-btn px-3 py-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 border-b-2 border-transparent transition-colors" data-tab="workflows">Workflows</button>
+<button class="tab-btn px-3 py-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 border-b-2 border-transparent transition-colors" data-tab="knowledge">Knowledge</button>
+<button class="tab-btn px-3 py-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 border-b-2 border-transparent transition-colors" data-tab="system">System</button>
+</nav>
+<div class="h-4 w-px bg-neutral-200 hidden md:block"></div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-neutral-300 bg-white text-xs font-medium text-neutral-700 hover:text-neutral-900 transition-colors shadow-2xs">
+<span class="material-symbols-outlined text-sm">ios_share</span>
+<span>Share</span>
+</button>
+<div class="w-7 h-7 rounded-full bg-neutral-900 text-white flex items-center justify-center text-xs font-bold font-display cursor-pointer hover:opacity-90">
+            A
+          </div>
+</div>
+</div>
+</header>
+<!-- Main Workspace Area -->
+<main class="w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 md:py-16 flex flex-col items-center">
+<!-- Status Badge -->
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100/90 border border-gray-200 text-neutral-800 text-xs font-medium mb-6">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neutral-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-neutral-900"></span>
+</span>
+<span class="font-mono text-[11px] font-semibold tracking-wide">AMPOLIN SOVEREIGN 3.5</span>
+<span class="text-neutral-400">•</span>
+<span class="text-neutral-500 text-[11px]">Neural Reasoning Core Active</span>
+</div>
+<!-- Hero Headline (Clean modern typography) -->
+<div class="text-center space-y-3 mb-8">
+<h1 class="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl text-neutral-900 tracking-tight">
+          Where can intelligence take you today?
+        </h1>
+<p class="text-neutral-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed font-normal">
+          Autonomous inference, multi-modal code synthesis, and deep synthesis workflows engineered for principal teams.
+        </p>
+</div>
+<!-- Mode Selector Pills (Black & White Minimalist) -->
+<div class="flex flex-wrap items-center justify-center gap-2 mb-6" id="mode-pills-container">
+<button class="mode-pill active flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-neutral-900 text-white text-xs font-medium transition-all shadow-xs" data-prompt="Analyze algorithmic complexity and potential race conditions in: ">
+<span class="material-symbols-outlined text-[15px]">psychology</span>
+<span>Deep Reasoning</span>
+</button>
+<button class="mode-pill flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-gray-200 text-neutral-700 hover:border-neutral-400 hover:text-black text-xs font-medium transition-all shadow-2xs" data-prompt="Synthesize a production-ready, type-safe implementation for: ">
+<span class="material-symbols-outlined text-[15px]">terminal</span>
+<span>Code Synthesis</span>
+</button>
+<button class="mode-pill flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-gray-200 text-neutral-700 hover:border-neutral-400 hover:text-black text-xs font-medium transition-all shadow-2xs" data-prompt="Conduct comprehensive market research, SEC citations, and competitive analysis on: ">
+<span class="material-symbols-outlined text-[15px]">travel_explore</span>
+<span>Live Research</span>
+</button>
+<button class="mode-pill flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-gray-200 text-neutral-700 hover:border-neutral-400 hover:text-black text-xs font-medium transition-all shadow-2xs" data-prompt="Generate an interactive artifact and visual canvas block for: ">
+<span class="material-symbols-outlined text-[15px]">view_quilt</span>
+<span>Artifact Canvas</span>
+</button>
+</div>
+<!-- Composer Card (Claude / ChatGPT style floating card) -->
+<div class="w-full mb-6">
+<div class="w-full rounded-2xl bg-white border border-gray-200 composer-shadow transition-all duration-200 p-4">
+<!-- Textarea area -->
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-neutral-400 text-lg mt-1 select-none">auto_awesome</span>
+<div class="flex-1 min-w-0">
+<textarea class="w-full bg-transparent resize-none font-sans text-sm md:text-base text-neutral-900 placeholder:text-neutral-400 focus:outline-none leading-relaxed border-none p-0 focus:ring-0" id="composer-input" placeholder="Ask Ampolin anything, drop datasets, or type '/' for agent protocols..." rows="3"></textarea>
+</div>
+</div>
+<!-- Composer Toolbar -->
+<div class="flex flex-wrap items-center justify-between gap-3 pt-3 mt-1 border-t border-neutral-100">
+<!-- Left Controls: Attachment & Toggles -->
+<div class="flex items-center gap-1.5">
+<button class="w-8 h-8 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 flex items-center justify-center transition-colors" title="Attach files or data">
+<span class="material-symbols-outlined text-[19px]">attach_file</span>
+</button>
+<button class="toolbar-toggle flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 text-neutral-700 hover:bg-neutral-50 transition-all text-xs font-medium" id="web-search-toggle" type="button">
+<span class="material-symbols-outlined text-sm text-neutral-600">public</span>
+<span>Web Search</span>
+</button>
+<button class="toolbar-toggle flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 text-neutral-700 hover:bg-neutral-50 transition-all text-xs font-medium" id="deep-think-toggle" type="button">
+<span class="material-symbols-outlined text-sm text-neutral-800">bolt</span>
+<span>o3 Deep Think</span>
+<span class="font-mono text-[10px] text-neutral-500 px-1 py-0.5 rounded bg-neutral-100">64k</span>
+</button>
+<button class="w-8 h-8 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 flex items-center justify-center transition-colors" title="Voice Input">
+<span class="material-symbols-outlined text-[19px]">mic</span>
+</button>
+</div>
+<!-- Right Controls: Tokens & Submit Arrow -->
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex items-center gap-1 text-[11px] font-mono text-neutral-400">
+<span>Tokens:</span>
+<span class="text-neutral-700 font-medium" id="token-counter">0 / 200k</span>
+</div>
+<button class="w-8 h-8 rounded-full bg-neutral-900 text-white hover:bg-black active:scale-95 flex items-center justify-center transition-all shadow-xs group" id="send-button" title="Send Prompt (Enter)">
+<span class="material-symbols-outlined text-base group-hover:-translate-y-0.5 transition-transform">arrow_upward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Prompt Quick Tags & Shortcuts -->
+<div class="flex items-center justify-between px-2 pt-2 text-[11px] text-neutral-400 font-mono">
+<div class="flex items-center gap-3">
+<button class="quick-chip hover:text-neutral-900 transition-colors flex items-center gap-1 cursor-pointer">
+<span class="material-symbols-outlined text-xs">integration_instructions</span> /code-review
+            </button>
+<button class="quick-chip hover:text-neutral-900 transition-colors flex items-center gap-1 cursor-pointer">
+<span class="material-symbols-outlined text-xs">finance_chip</span> /quant-model
+            </button>
+<button class="quick-chip hover:text-neutral-900 transition-colors flex items-center gap-1 cursor-pointer">
+<span class="material-symbols-outlined text-xs">network_node</span> /graph-planner
+            </button>
+</div>
+<span class="hidden sm:inline text-neutral-400">Shift + Enter for newline</span>
+</div>
+</div>
+<!-- Autonomous Capabilities Section: 2x2 Grid -->
+<div class="w-full max-w-4xl mt-2">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+<!-- Card 1: Quantum Computing -->
+<button class="capability-card group p-4 rounded-xl bg-white border border-gray-200 hover:border-neutral-900 hover:-translate-y-0.5 hover:shadow-card-hover transition-all text-left flex items-start justify-between">
+<div class="space-y-1 pr-2">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-neutral-700 group-hover:text-black">science</span>
+<div class="font-display font-semibold text-xs text-neutral-900 group-hover:text-black">Explain quantum computing</div>
+</div>
+<div class="text-[11px] text-neutral-500 leading-snug">Break down superposition and entanglement simply</div>
+</div>
+<span class="material-symbols-outlined text-sm text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">arrow_forward</span>
+</button>
+<!-- Card 2: Python Memory Leaks -->
+<button class="capability-card group p-4 rounded-xl bg-white border border-gray-200 hover:border-neutral-900 hover:-translate-y-0.5 hover:shadow-card-hover transition-all text-left flex items-start justify-between">
+<div class="space-y-1 pr-2">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-neutral-700 group-hover:text-black">terminal</span>
+<div class="font-display font-semibold text-xs text-neutral-900 group-hover:text-black">Audit Python memory leaks</div>
+</div>
+<div class="text-[11px] text-neutral-500 leading-snug">Inspect concurrency locks and garbage collection</div>
+</div>
+<span class="material-symbols-outlined text-sm text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">arrow_forward</span>
+</button>
+<!-- Card 3: Competitive Strategy -->
+<button class="capability-card group p-4 rounded-xl bg-white border border-gray-200 hover:border-neutral-900 hover:-translate-y-0.5 hover:shadow-card-hover transition-all text-left flex items-start justify-between">
+<div class="space-y-1 pr-2">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-neutral-700 group-hover:text-black">query_stats</span>
+<div class="font-display font-semibold text-xs text-neutral-900 group-hover:text-black">Analyze competitive strategy</div>
+</div>
+<div class="text-[11px] text-neutral-500 leading-snug">Synthesize SEC filing citations &amp; market positioning</div>
+</div>
+<span class="material-symbols-outlined text-sm text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">arrow_forward</span>
+</button>
+<!-- Card 4: Executive Brief -->
+<button class="capability-card group p-4 rounded-xl bg-white border border-gray-200 hover:border-neutral-900 hover:-translate-y-0.5 hover:shadow-card-hover transition-all text-left flex items-start justify-between">
+<div class="space-y-1 pr-2">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-neutral-700 group-hover:text-black">description</span>
+<div class="font-display font-semibold text-xs text-neutral-900 group-hover:text-black">Draft an executive brief</div>
+</div>
+<div class="text-[11px] text-neutral-500 leading-snug">Summarize technical roadmap for leadership team</div>
+</div>
+<span class="material-symbols-outlined text-sm text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">arrow_forward</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+<!-- Vanilla JS Interactive Experience -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const textarea = document.getElementById('composer-input');
+      const tokenCounter = document.getElementById('token-counter');
+      const sendButton = document.getElementById('send-button');
+      const modePills = document.querySelectorAll('.mode-pill');
+      const webToggle = document.getElementById('web-search-toggle');
+      const thinkToggle = document.getElementById('deep-think-toggle');
+      const quickChips = document.querySelectorAll('.quick-chip');
+      const modelBtn = document.getElementById('model-selector-btn');
+      const modelDropdown = document.getElementById('model-dropdown-menu');
+      const modelChevron = document.getElementById('model-chevron');
+      const modelOptions = document.querySelectorAll('.model-option');
+      const currentModelLabel = document.getElementById('current-model-label');
+      const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+      const mobileSidebarBtn = document.getElementById('mobile-sidebar-btn');
+      const sidebar = document.getElementById('sidebar');
+      const mainContainer = document.getElementById('main-container');
+      const sidebarOverlay = document.getElementById('sidebar-overlay');
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const chatItems = document.querySelectorAll('.chat-history-item');
+
+      // Auto-expanding textarea & token counter
+      if (textarea && tokenCounter) {
+        textarea.addEventListener('input', function() {
+          this.style.height = 'auto';
+          this.style.height = Math.min(this.scrollHeight, 220) + 'px';
+          const len = this.value.length;
+          const tokens = Math.round(len / 3.8);
+          tokenCounter.textContent = `${tokens} / 200k`;
+        });
+
+        textarea.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            executeSend();
+          }
+        });
+      }
+
+      function executeSend() {
+        if (!textarea) return;
+        if (textarea.value.trim().length > 0) {
+          textarea.value = '';
+          textarea.style.height = 'auto';
+          if (tokenCounter) tokenCounter.textContent = '0 / 200k';
+          textarea.placeholder = "Prompt executed. Ampolin is synthesizing response...";
+          setTimeout(() => {
+            textarea.placeholder = "Ask Ampolin anything, drop datasets, or type '/' for agent protocols...";
+          }, 2400);
+        }
+      }
+
+      if (sendButton) {
+        sendButton.addEventListener('click', executeSend);
+      }
+
+      // Mode pill selection & dynamic prompt priming
+      modePills.forEach(pill => {
+        pill.addEventListener('click', function() {
+          modePills.forEach(p => {
+            p.classList.remove('bg-neutral-900', 'text-white', 'shadow-xs');
+            p.classList.add('bg-white', 'border', 'border-gray-200', 'text-neutral-700');
+          });
+          this.classList.remove('bg-white', 'border', 'border-gray-200', 'text-neutral-700');
+          this.classList.add('bg-neutral-900', 'text-white', 'shadow-xs');
+
+          const promptPrefix = this.getAttribute('data-prompt');
+          if (promptPrefix && textarea) {
+            textarea.value = promptPrefix;
+            textarea.focus();
+            textarea.dispatchEvent(new Event('input'));
+          }
+        });
+      });
+
+      // Quick slash chips
+      quickChips.forEach(chip => {
+        chip.addEventListener('click', function() {
+          const text = this.textContent.trim();
+          if (textarea) {
+            textarea.value = text + ' ';
+            textarea.focus();
+            textarea.dispatchEvent(new Event('input'));
+          }
+        });
+      });
+
+      // Capability cards click to prompt
+      const capabilityCards = document.querySelectorAll('.capability-card');
+      capabilityCards.forEach(card => {
+        card.addEventListener('click', function() {
+          const title = this.querySelector('.font-display') ? this.querySelector('.font-display').textContent : 'Agent execution';
+          if (textarea) {
+            textarea.value = `Initiate ${title}: `;
+            textarea.focus();
+            textarea.dispatchEvent(new Event('input'));
+          }
+        });
+      });
+
+      // Web Search & Deep Think Toggles
+      [webToggle, thinkToggle].forEach(btn => {
+        if (!btn) return;
+        btn.addEventListener('click', function() {
+          const isActive = this.classList.contains('bg-neutral-900');
+          if (isActive) {
+            this.classList.remove('bg-neutral-900', 'text-white');
+            this.classList.add('border', 'border-gray-200', 'text-neutral-700', 'bg-white');
+          } else {
+            this.classList.remove('border', 'border-gray-200', 'text-neutral-700', 'bg-white');
+            this.classList.add('bg-neutral-900', 'text-white');
+          }
+        });
+      });
+
+      // Model Dropdown
+      if (modelBtn && modelDropdown) {
+        modelBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isHidden = modelDropdown.classList.contains('hidden');
+          if (isHidden) {
+            modelDropdown.classList.remove('hidden');
+            if (modelChevron) modelChevron.style.transform = 'rotate(180deg)';
+          } else {
+            modelDropdown.classList.add('hidden');
+            if (modelChevron) modelChevron.style.transform = 'rotate(0deg)';
+          }
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!modelDropdown.contains(e.target) && !modelBtn.contains(e.target)) {
+            modelDropdown.classList.add('hidden');
+            if (modelChevron) modelChevron.style.transform = 'rotate(0deg)';
+          }
+        });
+
+        modelOptions.forEach(opt => {
+          opt.addEventListener('click', function() {
+            const modelName = this.getAttribute('data-model');
+            if (currentModelLabel && modelName) {
+              currentModelLabel.textContent = modelName;
+            }
+            modelOptions.forEach(o => {
+              o.classList.remove('bg-neutral-50', 'font-medium');
+              const check = o.querySelector('.material-symbols-outlined');
+              if (check) check.remove();
+            });
+            this.classList.add('bg-neutral-50', 'font-medium');
+            const check = document.createElement('span');
+            check.className = 'material-symbols-outlined text-sm text-neutral-900 font-bold';
+            check.textContent = 'check';
+            this.appendChild(check);
+            modelDropdown.classList.add('hidden');
+            if (modelChevron) modelChevron.style.transform = 'rotate(0deg)';
+          });
+        });
+      }
+
+      // Sidebar collapse / expand
+      let sidebarVisible = true;
+      function toggleSidebar() {
+        if (window.innerWidth < 1024) {
+          const isOpen = !sidebar.classList.contains('-translate-x-full');
+          if (isOpen) {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+          } else {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarOverlay.classList.remove('hidden');
+          }
+        } else {
+          sidebarVisible = !sidebarVisible;
+          if (!sidebarVisible) {
+            sidebar.style.transform = 'translateX(-100%)';
+            mainContainer.style.paddingLeft = '0px';
+          } else {
+            sidebar.style.transform = 'translateX(0)';
+            mainContainer.style.paddingLeft = '18rem';
+          }
+        }
+      }
+
+      if (sidebarToggleBtn) sidebarToggleBtn.addEventListener('click', toggleSidebar);
+      if (mobileSidebarBtn) mobileSidebarBtn.addEventListener('click', toggleSidebar);
+      if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+          e.preventDefault();
+          toggleSidebar();
+        }
+      });
+
+      // Navigation tabs switching
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          tabBtns.forEach(b => {
+            b.classList.remove('text-neutral-900', 'font-semibold', 'border-black');
+            b.classList.add('text-neutral-500', 'font-medium', 'border-transparent');
+          });
+          this.classList.remove('text-neutral-500', 'font-medium', 'border-transparent');
+          this.classList.add('text-neutral-900', 'font-semibold', 'border-black');
+        });
+      });
+
+      // Chat history item selection
+      chatItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          chatItems.forEach(i => {
+            i.classList.remove('bg-neutral-100', 'text-neutral-900', 'font-medium');
+            i.classList.add('text-neutral-600');
+          });
+          this.classList.remove('text-neutral-600');
+          this.classList.add('bg-neutral-100', 'text-neutral-900', 'font-medium');
+        });
+      });
+
+      // New Chat button
+      const newChatBtn = document.getElementById('btn-new-chat');
+      if (newChatBtn) {
+        newChatBtn.addEventListener('click', () => {
+          if (textarea) {
+            textarea.value = '';
+            textarea.focus();
+            if (tokenCounter) tokenCounter.textContent = '0 / 200k';
+          }
+        });
+      }
+    });
+  </script>
+</body></html>

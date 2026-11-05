@@ -1,0 +1,16 @@
+{
+  "name": "ampolin-ai-agent",
+  "version": "1.0.0",
+  "description": "Ampolin AI — Autonomous Agent Studio with Groq, Gemini, n8n & Ollama",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "n8n": "n8n start",
+    "n8n:tunnel": "n8n start --tunnel"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

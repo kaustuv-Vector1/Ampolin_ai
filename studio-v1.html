@@ -1,0 +1,663 @@
+﻿<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ampolin AI - Autonomous Agent &amp; Computer Control Studio</title>
+<!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-container": "#fe932c",
+            "inverse-on-surface": "#f7efeb",
+            "surface-container-high": "#eee7e3",
+            "on-primary-container": "#fffbff",
+            "error-container": "#ffdad6",
+            "tertiary": "#145ea1",
+            "primary": "#9f3c16",
+            "primary-container": "#bf542c",
+            "tertiary-container": "#3977bb",
+            "inverse-surface": "#33302d",
+            "surface-variant": "#e9e1dd",
+            "on-primary-fixed": "#390c00",
+            "inverse-primary": "#ffb59c",
+            "tertiary-fixed-dim": "#a2c9ff",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed-dim": "#ffb59c",
+            "on-error": "#ffffff",
+            "background": "#fff8f5",
+            "on-secondary": "#ffffff",
+            "surface-dim": "#e0d8d5",
+            "on-secondary-fixed": "#2f1500",
+            "on-tertiary-fixed-variant": "#004881",
+            "secondary-fixed": "#ffdcc3",
+            "on-error-container": "#93000a",
+            "on-background": "#1e1b19",
+            "outline": "#8a726a",
+            "secondary-fixed-dim": "#ffb77d",
+            "on-surface-variant": "#57423b",
+            "surface-container": "#f4ece8",
+            "surface": "#fff8f5",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed-variant": "#6e3900",
+            "on-tertiary-fixed": "#001c38",
+            "surface-tint": "#a23e18",
+            "primary-fixed": "#ffdbcf",
+            "surface-container-low": "#faf2ee",
+            "outline-variant": "#dec0b7",
+            "on-surface": "#1e1b19",
+            "surface-bright": "#fff8f5",
+            "secondary": "#904d00",
+            "tertiary-fixed": "#d3e4ff",
+            "on-tertiary-container": "#fdfcff",
+            "error": "#ba1a1a",
+            "on-secondary-container": "#663500",
+            "on-primary": "#ffffff",
+            "surface-container-highest": "#e9e1dd",
+            "on-primary-fixed-variant": "#822801"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-xl": "2.5rem",
+            "gutter": "1rem",
+            "gutter-compact": "0.5rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "margin-sm": "1rem",
+            "space-md": "1rem",
+            "margin": "1.5rem"
+          },
+          "fontFamily": {
+            "code-sm": ["JetBrains Mono"],
+            "label-sm": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "code-md": ["JetBrains Mono"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "code-lg": ["JetBrains Mono"],
+            "display-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "code-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "400" }],
+            "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "code-md": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],
+            "code-lg": ["14px", { "lineHeight": "22px", "fontWeight": "500" }],
+            "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "headline-sm": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }],
+            "headline-md": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.015em", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    
+    /* Tactile soundwave visualizer animation */
+    @keyframes audioWave {
+      0%, 100% { height: 4px; }
+      50% { height: 20px; }
+    }
+    .wave-bar:nth-child(1) { animation: audioWave 1.1s ease-in-out infinite 0.1s; }
+    .wave-bar:nth-child(2) { animation: audioWave 0.9s ease-in-out infinite 0.25s; }
+    .wave-bar:nth-child(3) { animation: audioWave 1.4s ease-in-out infinite 0.05s; }
+    .wave-bar:nth-child(4) { animation: audioWave 0.7s ease-in-out infinite 0.3s; }
+    .wave-bar:nth-child(5) { animation: audioWave 1.2s ease-in-out infinite 0.18s; }
+    .wave-bar:nth-child(6) { animation: audioWave 0.8s ease-in-out infinite 0.4s; }
+    .wave-bar:nth-child(7) { animation: audioWave 1.3s ease-in-out infinite 0.12s; }
+
+    /* Concentric click target pulse */
+    @keyframes reticlePing {
+      0% { transform: scale(0.8); opacity: 0.9; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+    .reticle-ripple {
+      animation: reticlePing 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+    }
+
+    /* Custom thin scrollbars for dense code views */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #dec0b7;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #8a726a;
+    }
+  </style>
+</head>
+<body class="h-full bg-background text-on-surface antialiased flex flex-col font-body-md select-none overflow-hidden">
+<!-- TOP NAVIGATION BAR (Brand Anchor: TopNavBar with Exact Tokens) -->
+<header class="flex items-center justify-between px-space-lg w-full h-14 border-b border-outline-variant dark:border-outline bg-surface dark:bg-inverse-surface z-50 shrink-0">
+<!-- Left: Brand Logo, Workspace Breadcrumb, and Branch Tag -->
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-2">
+<span class="flex items-center justify-center w-7 h-7 rounded bg-primary text-on-primary shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</span>
+<span class="text-headline-sm font-headline-sm text-primary dark:text-primary-fixed-dim uppercase tracking-wider font-bold">
+          Ampolin AI
+        </span>
+</div>
+<div class="h-4 w-px bg-outline-variant"></div>
+<!-- Workspace Selector -->
+<div class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container-low border border-outline-variant/60 font-body-sm text-on-surface">
+<span class="text-on-surface-variant font-code-sm text-code-sm">Workspace:</span>
+<span class="font-code-sm text-code-sm font-medium">Ampolin Agent</span>
+<span class="text-on-surface-variant">/</span>
+<span class="font-code-sm text-code-sm text-primary font-semibold">core-service</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm ml-0.5">unfold_more</span>
+</div>
+<!-- Git Branch Pill -->
+<div class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container border border-outline-variant font-code-sm text-code-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm text-primary">alt_route</span>
+<span class="font-medium text-on-surface">feature/auto-deploy</span>
+<span class="text-outline">#a9f4c12</span>
+</div>
+</div>
+<!-- Center: Gemini Live Voice & Screen-Share HUD Cluster -->
+<div class="flex items-center gap-space-sm bg-surface-container-lowest px-3 py-1 rounded-full border border-outline-variant/80 shadow-sm">
+<!-- Gemini Live Voice Status -->
+<div class="flex items-center gap-2 px-2 py-0.5 rounded-full bg-primary-fixed/30 border border-primary/20">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span class="font-label-sm text-label-sm text-primary tracking-wider uppercase">Gemini Live: Connected</span>
+</div>
+<!-- Soundwave Visualizer Baffles -->
+<div class="flex items-center gap-0.5 h-6 px-1.5">
+<span class="wave-bar w-1 bg-secondary rounded-full"></span>
+<span class="wave-bar w-1 bg-primary rounded-full"></span>
+<span class="wave-bar w-1 bg-secondary-container rounded-full"></span>
+<span class="wave-bar w-1 bg-primary-container rounded-full"></span>
+<span class="wave-bar w-1 bg-secondary rounded-full"></span>
+<span class="wave-bar w-1 bg-primary rounded-full"></span>
+<span class="wave-bar w-1 bg-secondary-container rounded-full"></span>
+</div>
+<div class="h-3 w-px bg-outline-variant"></div>
+<!-- Screen Stream Monitor Pill -->
+<div class="flex items-center gap-1.5 text-on-surface-variant font-code-sm text-code-sm px-1.5">
+<span class="material-symbols-outlined text-primary text-base">desktop_windows</span>
+<span>Monitor 1 (Active)</span>
+</div>
+<!-- Telemetry Badge -->
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-secondary bg-secondary-fixed/40 px-2 py-0.5 rounded border border-secondary-fixed-dim/60">
+<span class="material-symbols-outlined text-xs">speed</span>
+<span>28ms</span>
+</div>
+</div>
+<!-- Right: System Permissions, Swarm Telemetry, and Profile -->
+<div class="flex items-center gap-2">
+<!-- OS Control Permission Badge -->
+<div class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container-low border border-outline-variant font-label-sm text-label-sm text-primary">
+<span class="material-symbols-outlined text-xs">touch_app</span>
+<span>OS Control: Allowed</span>
+</div>
+<!-- Swarm Badge -->
+<div class="flex items-center gap-1 px-2 py-1 rounded bg-secondary-fixed/50 border border-secondary/30 font-label-sm text-label-sm text-on-secondary-fixed-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container animate-pulse"></span>
+<span>3 Subagents Active</span>
+</div>
+<!-- Emergency Halt Button (Trailing Primary Action) -->
+<button class="flex items-center gap-1.5 px-3 py-1 rounded text-error border border-error/50 bg-error-container/20 font-label-md text-label-md hover:bg-error-container transition-colors duration-150 active:scale-[0.98]">
+<span class="material-symbols-outlined text-sm">cancel</span>
+<span>Emergency Halt</span>
+</button>
+<!-- Settings Icon -->
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded transition-colors" title="Engine Settings">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<!-- User Avatar with Autonomous Ring -->
+<div class="relative ml-1">
+<div class="w-8 h-8 rounded-full border-2 border-primary-container p-0.5 bg-surface-container-highest flex items-center justify-center text-primary font-headline-sm font-bold text-xs" title="User profile avatar with autonomous studio status indicator">
+          AI
+        </div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-secondary-container ring-1 ring-surface"></span>
+</div>
+</div>
+</header>
+<!-- MAIN DUAL-PANE WORKSPACE: Left 60% Execution & Feed | Right 40% Dynamic Computer & Code -->
+<main class="flex-1 flex overflow-hidden w-full">
+<!-- ========================================================================= -->
+<!-- LEFT COLUMN (60% Execution Canvas & Conversational Stream)                 -->
+<!-- ========================================================================= -->
+<section class="w-[60%] flex flex-col border-r border-outline-variant bg-surface relative h-full">
+<!-- Scrollable Agent Timeline and Thought Stream -->
+<div class="flex-1 overflow-y-auto p-space-md space-y-space-md pb-28">
+<!-- Agent Thought & Reasoning Box (Top of feed) -->
+<div class="rounded-xl border border-outline-variant bg-surface-container-low shadow-sm overflow-hidden">
+<div class="flex items-center justify-between px-space-md py-2.5 bg-surface-container border-b border-outline-variant/70">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<span class="font-headline-sm text-body-md font-semibold text-on-surface">Agent Reasoning Stream</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant">4 steps completed</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm text-outline">token_velocity: 84 tok/s</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer text-sm">expand_less</span>
+</div>
+</div>
+<!-- Step Progression List -->
+<div class="p-3.5 space-y-2.5 font-code-sm text-code-sm">
+<div class="flex items-start gap-2.5 text-on-surface">
+<span class="material-symbols-outlined text-primary text-base mt-0.5">check_circle</span>
+<div class="flex-1 flex items-center justify-between">
+<span>Inspecting DOM tree &amp; interactive UI elements at <span class="text-tertiary underline">http://localhost:5173</span></span>
+<span class="text-outline text-xs">Done (120ms)</span>
+</div>
+</div>
+<div class="flex items-start gap-2.5 text-on-surface">
+<span class="material-symbols-outlined text-primary text-base mt-0.5">check_circle</span>
+<div class="flex-1 flex items-center justify-between">
+<span>Locating 'Sign In' button coordinates via visual grounding</span>
+<span class="text-secondary font-medium">Matched at [420, 310] (99.4% conf)</span>
+</div>
+</div>
+<div class="flex items-start gap-2.5 text-on-surface">
+<span class="material-symbols-outlined text-primary text-base mt-0.5">check_circle</span>
+<div class="flex-1 flex items-center justify-between">
+<span>Executing native OS mouse displacement and click sequence</span>
+<span class="text-outline text-xs">Dispatched</span>
+</div>
+</div>
+<div class="flex items-start gap-2.5 text-primary">
+<span class="material-symbols-outlined text-base mt-0.5 animate-spin">progress_activity</span>
+<div class="flex-1 flex items-center justify-between font-medium">
+<span>Validating state update &amp; running verification test suite...</span>
+<span class="bg-primary/10 px-2 py-0.5 rounded text-xs">In Progress</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Conversational Feed Stream -->
+<div class="space-y-space-md">
+<!-- 1. User Voice Input Card -->
+<div class="flex items-start gap-3 pl-8">
+<div class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-xl p-3.5 shadow-sm space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-secondary bg-secondary-fixed/50 px-2 py-0.5 rounded border border-secondary-fixed-dim">
+<span class="material-symbols-outlined text-xs">mic</span>
+<span>Gemini Live Audio In (0:04s)</span>
+</span>
+<span class="font-body-sm text-body-sm text-outline">You</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">10:42:18 AM</span>
+</div>
+<!-- Message Prompt -->
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                "Debug the authentication flow and click through the login page to verify session persistence."
+              </p>
+<!-- Audio Waveform Playback Widget -->
+<div class="flex items-center gap-3 pt-1 border-t border-outline-variant/40 mt-2">
+<button class="w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-xs">play_arrow</span>
+</button>
+<div class="flex-1 flex items-center gap-1 h-3">
+<span class="w-1 h-2 bg-secondary/40 rounded-full"></span>
+<span class="w-1 h-3 bg-secondary rounded-full"></span>
+<span class="w-1 h-2 bg-secondary/50 rounded-full"></span>
+<span class="w-1 h-3.5 bg-secondary rounded-full"></span>
+<span class="w-1 h-2 bg-secondary rounded-full"></span>
+<span class="w-1 h-3 bg-secondary/80 rounded-full"></span>
+<span class="w-1 h-1.5 bg-secondary/30 rounded-full"></span>
+<span class="w-1 h-2 bg-secondary/40 rounded-full"></span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">00:04</span>
+</div>
+</div>
+<!-- User Avatar -->
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-outline-variant flex items-center justify-center font-headline-sm font-bold text-xs text-on-surface-variant">
+              ME
+            </div>
+</div>
+<!-- 2. Ampolin Agent Execution Response -->
+<div class="flex items-start gap-3 pr-4">
+<!-- Agent Avatar -->
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-sm shrink-0">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+</div>
+<div class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm space-y-3.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-body-md font-semibold text-on-surface">Ampolin Autonomous Core</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-primary-fixed/40 text-primary">Autonomous Mode</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">Just now</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                I analyzed the login flow. The issue was an unhandled promise rejection in <code class="font-code-sm text-code-sm bg-surface-container px-1 py-0.5 rounded text-primary">authService.ts</code>. I performed a computer-use click on the Sign In button, and re-ran the authentication test suite.
+              </p>
+<!-- TOOL EXECUTION BLOCK 1: OS Computer Control Action -->
+<div class="rounded-lg border border-outline-variant bg-surface-container-low overflow-hidden">
+<div class="flex items-center justify-between px-3 py-2 bg-surface-container border-b border-outline-variant">
+<div class="flex items-center gap-2 font-code-sm text-code-sm font-medium text-on-surface">
+<span class="material-symbols-outlined text-secondary text-base">mouse</span>
+<span>OS Computer Control â€¢ Native Mouse Event</span>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded">Action 1/2</span>
+</div>
+<div class="p-3 space-y-2">
+<div class="flex items-center justify-between font-code-sm text-code-sm">
+<span class="text-on-surface-variant">Dispatched: <strong class="text-on-surface">Simulated Click at (x: 420, y: 310) on 'Sign In' Button</strong></span>
+<span class="text-primary font-medium">Confidence: 99.4%</span>
+</div>
+<!-- Mini Target Preview -->
+<div class="relative w-full h-24 bg-surface-container-high rounded border border-outline-variant/60 overflow-hidden flex items-center justify-center">
+<!-- Stylized mini mockup login UI -->
+<div class="w-64 bg-surface-container-lowest p-2 rounded shadow-xs border border-outline-variant/40 space-y-1.5 opacity-90">
+<div class="h-2 w-16 bg-surface-container-high rounded"></div>
+<div class="h-4 w-full bg-surface-container rounded border border-outline-variant/30 flex items-center px-1">
+<span class="text-[8px] text-outline">user@ampolin.ai</span>
+</div>
+<div class="h-4 w-full bg-primary text-on-primary rounded flex items-center justify-center text-[9px] font-bold">
+                        Sign In
+                      </div>
+</div>
+<!-- Target Coordinate Marker -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="relative">
+<span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings: 'FILL' 1;">near_me</span>
+<span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary/30 border border-primary animate-ping"></span>
+<span class="absolute -bottom-4 left-4 bg-inverse-surface text-inverse-on-surface font-code-sm text-[9px] px-1 rounded whitespace-nowrap">
+                          [420, 310]
+                        </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- TOOL EXECUTION BLOCK 2: Terminal Snippet -->
+<div class="rounded-lg border border-outline-variant bg-inverse-surface text-inverse-on-surface font-code-sm text-code-sm overflow-hidden shadow-inner">
+<div class="flex items-center justify-between px-3 py-1.5 bg-[#25221F] border-b border-outline/30">
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-secondary-container"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary-container"></span>
+</div>
+<span class="text-xs text-outline font-medium">bash â€¢ /workspace/core-service</span>
+</div>
+<span class="text-[10px] text-outline">Exit Code: 0</span>
+</div>
+<div class="p-3 space-y-1 font-mono">
+<div class="text-inverse-primary">$ npm test -- auth.test.ts</div>
+<div class="text-[#84cc16] font-medium pt-1"> PASS  src/services/auth.test.ts</div>
+<div class="text-inverse-on-surface pl-2">  âœ“ should successfully exchange credentials for JWT session (42ms)</div>
+<div class="text-inverse-on-surface pl-2">  âœ“ should preserve session cookie on hard reload (18ms)</div>
+<div class="text-outline-variant pt-1 text-xs">Tests: 2 passed, 2 total | Time: 1.14s</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- BOTTOM FLOATING MULTIMODAL COMMAND BAR -->
+<div class="absolute bottom-4 left-4 right-4 z-40">
+<div class="bg-surface-container-lowest/95 backdrop-blur-md rounded-xl border border-outline-variant shadow-lg p-2.5">
+<!-- Text and multimodal instruction bar -->
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container-high rounded transition-colors" title="Attach file or screenshot">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<input class="flex-1 bg-transparent border-none text-body-md font-body-md text-on-surface placeholder:text-outline focus:ring-0 focus:outline-none px-2" placeholder="Type instruction or speak with Gemini Live (/control, /code, /subagent)..." type="text" value="Verify cookie expiration after session invalidation"/>
+<!-- Gemini Live Voice Activation Button -->
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary-fixed/40 text-secondary border border-secondary/30 hover:bg-secondary-fixed hover:border-secondary transition-all" title="Push-to-Talk Voice Stream">
+<span class="material-symbols-outlined text-sm">mic</span>
+<span class="font-label-sm text-label-sm">Gemini Live</span>
+</button>
+<!-- Screen Mirror Toggle -->
+<button class="p-2 text-primary hover:bg-surface-container-high rounded transition-colors" title="Toggle active OS stream">
+<span class="material-symbols-outlined">screen_share</span>
+</button>
+<!-- Primary Action CTA Button -->
+<button class="flex items-center gap-1.5 px-4 py-2 rounded bg-primary hover:bg-primary-container text-on-primary font-headline-sm text-body-sm font-semibold shadow-sm transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-sm">play_arrow</span>
+<span>Run Agent</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- RIGHT COLUMN (40% Dynamic Computer & Code Workspace)                      -->
+<!-- ========================================================================= -->
+<section class="w-[40%] flex flex-col bg-surface-container-low h-full overflow-hidden">
+<!-- Dynamic Tab Bar Header -->
+<div class="flex items-center justify-between border-b border-outline-variant bg-surface px-space-md pt-2 shrink-0">
+<div class="flex items-center gap-4">
+<!-- Active Tab: Live Computer View -->
+<button class="flex items-center gap-1.5 pb-2.5 border-b-2 border-primary text-primary font-headline-sm text-body-sm font-semibold">
+<span class="material-symbols-outlined text-sm">tv</span>
+<span>Live Computer View</span>
+</button>
+<button class="flex items-center gap-1.5 pb-2.5 text-on-surface-variant hover:text-on-surface font-headline-sm text-body-sm font-normal">
+<span class="material-symbols-outlined text-sm">difference</span>
+<span>Code &amp; Diff</span>
+</button>
+<button class="flex items-center gap-1.5 pb-2.5 text-on-surface-variant hover:text-on-surface font-headline-sm text-body-sm font-normal">
+<span class="material-symbols-outlined text-sm">terminal</span>
+<span>Terminal Logs</span>
+</button>
+<button class="flex items-center gap-1.5 pb-2.5 text-on-surface-variant hover:text-on-surface font-headline-sm text-body-sm font-normal">
+<span class="material-symbols-outlined text-sm">hub</span>
+<span>Subagent Swarm</span>
+</button>
+</div>
+<span class="font-code-sm text-code-sm text-outline mb-2">1920x1080 â€¢ 60 FPS</span>
+</div>
+<!-- Quick Action Floating Bar on Computer Stream -->
+<div class="flex items-center justify-between px-space-md py-2 bg-surface-container border-b border-outline-variant shrink-0">
+<div class="flex items-center gap-2">
+<!-- Take Over Control Toggle Button -->
+<button class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container-lowest border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-xs text-primary">pan_tool</span>
+<span>Take Over Control</span>
+</button>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container-lowest border border-outline-variant font-label-md text-label-md text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-xs">camera_alt</span>
+<span>Snapshot</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-fixed/30 px-2 py-0.5 rounded border border-secondary-fixed-dim">
+            LIVE OS STREAM
+          </span>
+</div>
+</div>
+<!-- Live Stream Preview Card Container -->
+<div class="flex-1 p-space-md flex flex-col space-y-space-md overflow-y-auto">
+<!-- Visual Monitor Canvas -->
+<div class="relative bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col min-h-[260px] h-[48%]">
+<!-- OS Browser Chrome -->
+<div class="flex items-center justify-between px-3 py-1.5 bg-surface-container border-b border-outline-variant/60">
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1">
+<span class="w-2.5 h-2.5 rounded-full bg-error/70"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-secondary-container/70"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container/70"></span>
+</div>
+<div class="flex items-center gap-1 text-[11px] font-code-sm bg-surface px-2.5 py-0.5 rounded border border-outline-variant/40 text-on-surface-variant">
+<span class="material-symbols-outlined text-xs">lock</span>
+<span>http://localhost:5173/auth/login</span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-xs">refresh</span>
+<span class="material-symbols-outlined text-xs">close</span>
+</div>
+</div>
+<!-- Simulated Desktop Web App (Login / Dashboard) -->
+<div class="flex-1 p-4 bg-[#FBF9F5] flex items-center justify-center relative">
+<div class="w-72 bg-surface-container-lowest p-5 rounded-lg border border-outline-variant/80 shadow-sm space-y-3">
+<div class="space-y-1">
+<div class="font-headline-sm text-body-md font-bold text-on-surface">Welcome back</div>
+<div class="font-body-sm text-body-sm text-outline">Authenticate to continue to core-service</div>
+</div>
+<div class="space-y-2">
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant">EMAIL ADDRESS</label>
+<div class="mt-0.5 px-2.5 py-1.5 bg-surface-container-low rounded border border-outline-variant font-code-sm text-code-sm text-on-surface">
+                    alex.turner@ampolin.ai
+                  </div>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant">PASSWORD</label>
+<div class="mt-0.5 px-2.5 py-1.5 bg-surface-container-low rounded border border-outline-variant font-code-sm text-code-sm text-on-surface flex justify-between">
+<span>â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢</span>
+<span class="text-outline text-xs">show</span>
+</div>
+</div>
+</div>
+<!-- Interactive Simulated Sign In Button Target -->
+<div class="relative mt-2" id="target-button">
+<div class="w-full py-2 bg-primary text-on-primary font-headline-sm text-body-sm font-semibold rounded text-center shadow-xs">
+                  Sign In to Workspace
+                </div>
+<!-- Computer Control Reticle & Dynamic Cursor Overlay -->
+<div class="absolute -top-3 left-[58%] pointer-events-none flex flex-col items-start z-30">
+<!-- Circular halo & reticle ripple -->
+<div class="relative w-8 h-8 flex items-center justify-center">
+<span class="reticle-ripple absolute inset-0 rounded-full border-2 border-secondary bg-secondary/20"></span>
+<span class="material-symbols-outlined text-secondary text-2xl drop-shadow-md" style="font-variation-settings: 'FILL' 1;">near_me</span>
+</div>
+<!-- Attached Coordinate Chip -->
+<div class="ml-4 -mt-2 bg-inverse-surface text-inverse-on-surface font-code-sm text-[10px] px-2 py-0.5 rounded shadow-md border border-outline whitespace-nowrap">
+                    X: 0420 | Y: 0310 <span class="text-secondary font-bold">[CLICK_LEFT]</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Watermark Overlay -->
+<div class="absolute bottom-2 right-3 font-code-sm text-[10px] text-outline/80 tracking-wide pointer-events-none">
+              Ampolin Computer Agent Live Mirror â€¢ v2.4.1
+            </div>
+</div>
+</div>
+<!-- Split Lower Card: Code Diff Preview -->
+<div class="flex-1 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col min-h-[220px]">
+<div class="flex items-center justify-between px-space-md py-2 bg-surface-container border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary">difference</span>
+<span class="font-code-sm text-code-sm font-semibold text-on-surface">src/services/authService.ts</span>
+<span class="font-label-sm text-label-sm text-primary bg-primary-fixed/40 px-1.5 py-0.2 rounded">+12</span>
+<span class="font-label-sm text-label-sm text-error bg-error-container/40 px-1.5 py-0.2 rounded">-4</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
+<span>UNIFIED VIEW</span>
+</div>
+</div>
+<!-- Code Diff Body -->
+<div class="flex-1 p-3 overflow-y-auto font-code-sm text-code-sm bg-surface-container-lowest space-y-0.5">
+<div class="text-outline">@@ -42,7 +42,8 @@ export async function handleSessionAuth(credentials) {</div>
+<div class="text-on-surface-variant pl-4">  const client = getAuthClient();</div>
+<div class="text-on-surface-variant pl-4">  let sessionToken: string | null = null;</div>
+<div class="bg-error-container/30 text-error flex items-center px-1 rounded-xs">
+<span class="w-6 text-outline select-none">- 45</span>
+<span>-   const token = await auth.login(credentials);</span>
+</div>
+<div class="bg-primary-fixed/30 text-primary font-medium flex items-center px-1 rounded-xs">
+<span class="w-6 text-outline select-none">+ 45</span>
+<span>+   const { token, session } = await auth.loginWithRetry(credentials, {</span>
+</div>
+<div class="bg-primary-fixed/30 text-primary font-medium flex items-center px-1 rounded-xs">
+<span class="w-6 text-outline select-none">+ 46</span>
+<span>+     timeout: 3000,</span>
+</div>
+<div class="bg-primary-fixed/30 text-primary font-medium flex items-center px-1 rounded-xs">
+<span class="w-6 text-outline select-none">+ 47</span>
+<span>+     persistCookie: true</span>
+</div>
+<div class="bg-primary-fixed/30 text-primary font-medium flex items-center px-1 rounded-xs">
+<span class="w-6 text-outline select-none">+ 48</span>
+<span>+   });</span>
+</div>
+<div class="text-on-surface-variant pl-4">  return { status: 200, sessionToken: token };</div>
+<div class="text-outline">}</div>
+</div>
+</div>
+<!-- Subagent Swarm Telemetry Bar -->
+<div class="rounded-xl border border-outline-variant bg-surface-container-lowest p-3 shadow-xs space-y-2 shrink-0">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-on-surface-variant font-bold uppercase tracking-wider">Swarm Coordination Activity</span>
+<span class="text-primary font-code-sm">2 of 3 Active</span>
+</div>
+<div class="space-y-1.5 font-code-sm text-code-sm">
+<div class="flex items-center justify-between p-1.5 rounded bg-surface-container-low border border-outline-variant/40">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span class="text-on-surface font-medium">Researcher Subagent #1:</span>
+<span class="text-outline text-xs">Analyzing OAuth 2.1 RFC spec</span>
+</div>
+<span class="font-label-sm text-label-sm px-1.5 py-0.2 rounded bg-surface-container text-on-surface-variant">Done</span>
+</div>
+<div class="flex items-center justify-between p-1.5 rounded bg-surface-container-low border border-outline-variant/40">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-on-surface font-medium">Tester Subagent #2:</span>
+<span class="text-outline text-xs">Watching auth.test.ts pipeline</span>
+</div>
+<span class="font-label-sm text-label-sm px-1.5 py-0.2 rounded bg-primary-fixed/40 text-primary">Active</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Interactive JavaScript for micro-interactions -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Toggle button micro-interaction feedback
+      const emergencyBtn = document.querySelector('button:has(.material-symbols-outlined:contains("cancel"))');
+      const targetBtn = document.getElementById('target-button');
+
+      if (targetBtn) {
+        targetBtn.addEventListener('mouseenter', () => {
+          targetBtn.style.transform = 'scale(0.99)';
+        });
+        targetBtn.addEventListener('mouseleave', () => {
+          targetBtn.style.transform = 'scale(1)';
+        });
+      }
+    });
+  </script>
+</body></html>
