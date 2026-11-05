@@ -1,6 +1,7 @@
 const { onRequest } = require('firebase-functions/v2/https');
 const express = require('express');
 const cors = require('cors');
+const { AnthropicVertex } = require('@anthropic-ai/vertex-sdk');
 
 const app = express();
 app.use(cors({ origin: true }));
@@ -16,7 +17,57 @@ Tone: Direct, intellectual, highly competent, clean formatting with markdown.`;
 const GROQ_KEY = process.env.GROQ_API_KEY;
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
-// 1. Groq Cloud Engine
+// 1. Anthropic Claude Engine via Google Cloud Vertex AI
+let vertexAnthropic = null;
+function getVertexAnthropic() {
+  if (!vertexAnthropic) {
+    try {
+      const projectId = process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT || 'ampolin-ai';
+      vertexAnthropic = new AnthropicVertex({
+        region: process.env.CLOUD_ML_REGION || 'global',
+        projectId: projectId
+      });
+    } catch (err) {
+      console.error('[Anthropic Vertex Init Error]:', err.message);
+    }
+  }
+  return vertexAnthropic;
+}
+
+async function callClaude(prompt, history, modelName = 'claude-sonnet-5-5') {
+  try {
+    const client = getVertexAnthropic();
+    if (!client) return null;
+
+    const messages = [
+      ...history.slice(-10).map(h => ({
+        role: h.role === 'assistant' ? 'assistant' : 'user',
+        content: typeof h.content === 'string' ? h.content : JSON.stringify(h.content)
+      })),
+      { role: 'user', content: prompt }
+    ];
+
+    const res = await client.messages.create({
+      model: 'claude-sonnet-5-5',
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      messages: messages
+    });
+
+    if (res?.content?.[0]?.text) {
+      return {
+        reply: res.content[0].text.trim(),
+        provider: 'Anthropic Claude (Vertex AI)',
+        model: 'Claude Sonnet 5.5'
+      };
+    }
+  } catch (err) {
+    console.error('[Claude Vertex Execution Error]:', err.message);
+  }
+  return null;
+}
+
+// 2. Groq Cloud Engine
 async function callGroq(prompt, history, modelName = 'openai/gpt-oss-120b') {
   if (!GROQ_KEY) return null;
   try {
@@ -114,16 +165,25 @@ async function callGemini(prompt, history) {
 
 // Route: /api/chat or /chat
 app.post(['/api/chat', '/chat'], async (req, res) => {
-  const { message, model = 'Ampolin Opus 3.5', history = [] } = req.body;
+  const { message, model = 'Claude Sonnet 5.5', history = [] } = req.body;
   if (!message || typeof message !== 'string') {
     return res.status(400).json({ error: 'Message is required' });
   }
 
+  const modelLower = (model || '').toLowerCase();
   let result = null;
-  if (model.toLowerCase().includes('gemini')) {
+
+  // 1. If Claude requested, call Vertex AI Claude first
+  if (modelLower.includes('claude') || modelLower.includes('sonnet') || modelLower.includes('anthropic') || modelLower.includes('opus')) {
+    result = await callClaude(message, history, model);
+    if (!result) result = await callGroq(message, history, 'openai/gpt-oss-120b');
+    if (!result) result = await callGemini(message, history);
+  } else if (modelLower.includes('gemini')) {
     result = await callGemini(message, history) || await callGroq(message, history, model);
   } else {
+    // Default / Groq
     result = await callGroq(message, history, model);
+    if (!result) result = await callClaude(message, history, model);
     if (!result) result = await callGemini(message, history);
   }
 
@@ -143,6 +203,7 @@ app.post(['/api/chat', '/chat'], async (req, res) => {
 app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     status: 'online',
+    claude: 'Anthropic Claude Sonnet 5.5 (Vertex AI)',
     groq: Boolean(GROQ_KEY),
     gemini: Boolean(GEMINI_KEY),
     cloud: 'Firebase 2nd Gen Cloud Functions',

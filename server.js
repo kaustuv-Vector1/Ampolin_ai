@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const { exec } = require('child_process');
+const { AnthropicVertex } = require('@anthropic-ai/vertex-sdk');
 require('dotenv').config();
 
 const app = express();
@@ -25,6 +26,56 @@ Your capabilities:
 2. Generating clean, type-safe, production-ready code with diff explanations.
 3. Suggesting precise terminal shell commands and OS actions.
 Tone: Direct, intellectual, highly competent, clean formatting with markdown.`;
+
+// 0. Anthropic Claude Engine via Google Cloud Vertex AI
+let vertexAnthropic = null;
+function getVertexAnthropic() {
+  if (!vertexAnthropic) {
+    try {
+      const projectId = process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT || 'ampolin-ai';
+      vertexAnthropic = new AnthropicVertex({
+        region: process.env.CLOUD_ML_REGION || 'global',
+        projectId: projectId
+      });
+    } catch (err) {
+      console.error('[Anthropic Vertex Init Error]:', err.message);
+    }
+  }
+  return vertexAnthropic;
+}
+
+async function callClaude(prompt, history, modelName = 'claude-sonnet-5-5') {
+  try {
+    const client = getVertexAnthropic();
+    if (!client) return null;
+
+    const messages = [
+      ...history.slice(-10).map(h => ({
+        role: h.role === 'assistant' ? 'assistant' : 'user',
+        content: typeof h.content === 'string' ? h.content : JSON.stringify(h.content)
+      })),
+      { role: 'user', content: prompt }
+    ];
+
+    const res = await client.messages.create({
+      model: 'claude-sonnet-5-5',
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      messages: messages
+    });
+
+    if (res?.content?.[0]?.text) {
+      return {
+        reply: res.content[0].text.trim(),
+        provider: 'Anthropic Claude (Vertex AI)',
+        model: 'Claude Sonnet 5.5'
+      };
+    }
+  } catch (err) {
+    console.error('[Claude Vertex Execution Error]:', err.message);
+  }
+  return null;
+}
 
 // 1. Direct Groq Cloud AI Engine
 async function callGroq(prompt, history, modelName = 'openai/gpt-oss-120b') {
@@ -217,18 +268,25 @@ app.post('/api/chat', async (req, res) => {
   let result = null;
 
   // Route according to user selection or tier fallback
-  if (model.toLowerCase().includes('gemini')) {
+  const modelLower = (model || '').toLowerCase();
+  if (modelLower.includes('claude') || modelLower.includes('sonnet') || modelLower.includes('anthropic') || modelLower.includes('opus')) {
+    result = await callClaude(message, history, model);
+    if (!result) result = await callGroq(message, history, 'openai/gpt-oss-120b');
+    if (!result) result = await callGemini(message, history);
+  } else if (modelLower.includes('gemini')) {
     result = await callGemini(message, history) || await callGroq(message, history, model);
-  } else if (model.toLowerCase().includes('n8n')) {
+  } else if (modelLower.includes('n8n')) {
     result = await callN8n(message, sessionId) || await callGroq(message, history, model);
   } else {
     // Primary: Groq Cloud (ultra fast)
     result = await callGroq(message, history, model);
-    // Tier 2: Gemini Cloud
+    // Tier 2: Claude Sonnet 5.5
+    if (!result) result = await callClaude(message, history, model);
+    // Tier 3: Gemini Cloud
     if (!result) result = await callGemini(message, history);
-    // Tier 3: n8n Workflow
+    // Tier 4: n8n Workflow
     if (!result) result = await callN8n(message, sessionId);
-    // Tier 4: Ollama Local (Offline)
+    // Tier 5: Ollama Local (Offline)
     if (!result) result = await callOllama(message, history);
   }
 

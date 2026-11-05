@@ -218,30 +218,30 @@
 <!-- Model Selector Pill with Dropdown -->
 <div class="relative">
 <button class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 transition-all text-xs text-neutral-800 font-medium shadow-2xs group" id="model-selector-btn">
-<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-<span class="font-display font-semibold text-neutral-900" id="current-model-label">Ampolin Opus 3.5</span>
-<span class="text-[10px] font-mono text-neutral-400 px-1.5 py-0.5 rounded bg-neutral-100">200k</span>
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-display font-semibold text-neutral-900" id="current-model-label">Claude Sonnet 5.5</span>
+<span class="text-[10px] font-mono text-emerald-800 px-1.5 py-0.5 rounded bg-emerald-100 font-semibold">Vertex AI</span>
 <span class="material-symbols-outlined text-sm text-neutral-400 group-hover:text-neutral-800 transition-transform" id="model-chevron">keyboard_arrow_down</span>
 </button>
 <!-- Dropdown Menu -->
-<div class="hidden absolute left-0 mt-2 w-64 bg-white rounded-2xl border border-gray-200 shadow-dropdown p-1.5 z-50 text-xs transition-all" id="model-dropdown-menu">
+<div class="hidden absolute left-0 mt-2 w-72 bg-white rounded-2xl border border-gray-200 shadow-dropdown p-1.5 z-50 text-xs transition-all" id="model-dropdown-menu">
 <div class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Available Foundations</div>
-<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl bg-neutral-50 text-neutral-900 font-medium hover:bg-neutral-100 text-left transition-colors" data-model="Ampolin Opus 3.5" data-tokens="200k">
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl bg-neutral-50 text-neutral-900 font-medium hover:bg-neutral-100 text-left transition-colors" data-model="Claude Sonnet 5.5" data-tokens="200k">
 <div class="flex items-center gap-2">
 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
 <div>
-<div class="font-semibold text-neutral-900">Ampolin Opus 3.5</div>
-<div class="text-[10px] text-neutral-500">Autonomous reasoning leader</div>
+<div class="font-semibold text-neutral-900 flex items-center gap-1.5">Claude Sonnet 5.5 <span class="text-[9px] px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold uppercase">Active</span></div>
+<div class="text-[10px] text-neutral-500">Google Cloud Vertex AI • Enterprise</div>
 </div>
 </div>
 <span class="material-symbols-outlined text-sm text-neutral-900 font-bold">check</span>
 </button>
-<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="Claude 3.5 Sonnet" data-tokens="200k">
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="Ampolin Opus 3.5" data-tokens="200k">
 <div class="flex items-center gap-2">
 <span class="w-2 h-2 rounded-full bg-neutral-400"></span>
 <div>
-<div class="font-medium text-neutral-800">Claude 3.5 Sonnet</div>
-<div class="text-[10px] text-neutral-500">Superior coding &amp; nuanced tone</div>
+<div class="font-medium text-neutral-800">Ampolin Opus 3.5</div>
+<div class="text-[10px] text-neutral-500">Groq Cloud ultra-fast inference</div>
 </div>
 </div>
 </button>
