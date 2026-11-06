@@ -176,7 +176,7 @@
 <span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
 </a>
 <a class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors group" href="#">
-<span class="truncate">Claude Sonnet prompt synthesis</span>
+<span class="truncate">Gemini Flash reasoning pipeline</span>
 <span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
 </a>
 </nav>
@@ -218,30 +218,30 @@
 <!-- Model Selector Pill with Dropdown -->
 <div class="relative">
 <button class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 transition-all text-xs text-neutral-800 font-medium shadow-2xs group" id="model-selector-btn">
-<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-<span class="font-display font-semibold text-neutral-900" id="current-model-label">Claude Sonnet 5.5</span>
-<span class="text-[10px] font-mono text-emerald-800 px-1.5 py-0.5 rounded bg-emerald-100 font-semibold">Vertex AI</span>
+<span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+<span class="font-display font-semibold text-neutral-900" id="current-model-label">Gemini 3.8 Flash</span>
+<span class="text-[10px] font-mono text-blue-800 px-1.5 py-0.5 rounded bg-blue-100 font-semibold">1M Flash</span>
 <span class="material-symbols-outlined text-sm text-neutral-400 group-hover:text-neutral-800 transition-transform" id="model-chevron">keyboard_arrow_down</span>
 </button>
 <!-- Dropdown Menu -->
-<div class="hidden absolute left-0 mt-2 w-72 bg-white rounded-2xl border border-gray-200 shadow-dropdown p-1.5 z-50 text-xs transition-all" id="model-dropdown-menu">
+<div class="hidden absolute left-0 mt-2 w-68 bg-white rounded-2xl border border-gray-200 shadow-dropdown p-1.5 z-50 text-xs transition-all" id="model-dropdown-menu">
 <div class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Available Foundations</div>
-<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl bg-neutral-50 text-neutral-900 font-medium hover:bg-neutral-100 text-left transition-colors" data-model="Claude Sonnet 5.5" data-tokens="200k">
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl bg-neutral-50 text-neutral-900 font-medium hover:bg-neutral-100 text-left transition-colors" data-model="Gemini 3.8 Flash" data-tokens="1M">
 <div class="flex items-center gap-2">
-<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="w-2 h-2 rounded-full bg-blue-500"></span>
 <div>
-<div class="font-semibold text-neutral-900 flex items-center gap-1.5">Claude Sonnet 5.5 <span class="text-[9px] px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold uppercase">Active</span></div>
-<div class="text-[10px] text-neutral-500">Google Cloud Vertex AI • Enterprise</div>
+<div class="font-semibold text-neutral-900 flex items-center gap-1.5">Gemini 3.8 Flash <span class="text-[9px] px-1 py-0.2 rounded bg-blue-100 text-blue-800 font-bold uppercase">Active</span></div>
+<div class="text-[10px] text-neutral-500">Google AI Studio • 1M Context</div>
 </div>
 </div>
 <span class="material-symbols-outlined text-sm text-neutral-900 font-bold">check</span>
 </button>
-<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="Ampolin Opus 3.5" data-tokens="200k">
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="Ampolin Opus 3.5" data-tokens="120B">
 <div class="flex items-center gap-2">
-<span class="w-2 h-2 rounded-full bg-neutral-400"></span>
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
 <div>
 <div class="font-medium text-neutral-800">Ampolin Opus 3.5</div>
-<div class="text-[10px] text-neutral-500">Groq Cloud ultra-fast inference</div>
+<div class="text-[10px] text-neutral-500">Groq Cloud 120B SOTA reasoning</div>
 </div>
 </div>
 </button>
@@ -259,7 +259,7 @@
 <span class="w-2 h-2 rounded-full bg-neutral-400"></span>
 <div>
 <div class="font-medium text-neutral-800">DeepSeek R1 Sovereign</div>
-<div class="text-[10px] text-neutral-500">Pure chain-of-thought logic</div>
+<div class="text-[10px] text-neutral-500">Open-weights reasoning engine</div>
 </div>
 </div>
 </button>
@@ -559,7 +559,7 @@
           }
         } catch (err) {
           const replyBox = aiCard.querySelector('.ai-reply-content');
-          replyBox.innerHTML = `<div class="text-red-600 text-xs">Error connecting to server. Is <code>node server.js</code> running?</div>`;
+          replyBox.innerHTML = `<div class="text-red-600 text-xs">${escapeHtml(err.message || 'Error connecting to server. Please try again.')}</div>`;
         }
 
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });

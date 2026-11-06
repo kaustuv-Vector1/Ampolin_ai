@@ -127,56 +127,74 @@ async function callGroq(prompt, history, modelName = 'openai/gpt-oss-120b') {
 }
 
 // 2. Direct Google Gemini AI Engine
+// 2. Direct Google Gemini AI Engine
+async function fetchGeminiModel(modelName, timeoutMs, prompt, history) {
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (!geminiKey) return null;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  const contents = [
+    ...history.slice(-10).map(h => ({
+      role: h.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: typeof h.content === 'string' ? h.content : JSON.stringify(h.content) }]
+    })),
+    { role: 'user', parts: [{ text: prompt }] }
+  ];
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: contents,
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 4096
+        }
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timer);
+
+    if (res.ok) {
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (text) {
+        return {
+          reply: text,
+          provider: 'Google Gemini',
+          model: modelName.replace('gemini-', 'Gemini ').replace('-preview', '')
+        };
+      }
+    }
+  } catch (err) {
+    clearTimeout(timer);
+  }
+  return null;
+}
+
 async function callGemini(prompt, history) {
   const geminiKey = process.env.GEMINI_API_KEY;
   if (!geminiKey) return null;
 
-  const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+  // Staggered race: Give Gemini 3.8 Flash 1200ms headstart. If still pending, race with Gemini 3.5 Flash!
+  const p38 = fetchGeminiModel('gemini-3.8-flash', 3500, prompt, history);
+  const headstart = new Promise(resolve => setTimeout(resolve, 1200));
 
-  for (const model of modelsToTry) {
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 12000);
+  const fast38 = await Promise.race([p38, headstart.then(() => null)]);
+  if (fast38) return fast38;
 
-      const contents = [
-        ...history.slice(-10).map(h => ({
-          role: h.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: h.content }]
-        })),
-        { role: 'user', parts: [{ text: prompt }] }
-      ];
+  const p35 = fetchGeminiModel('gemini-3.5-flash', 4000, prompt, history);
+  const winner = await Promise.race([
+    p38.then(r => r || new Promise(() => {})),
+    p35.then(r => r || new Promise(() => {})),
+    new Promise(r => setTimeout(() => r(null), 4500))
+  ]);
 
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          contents: contents,
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 4096
-          }
-        }),
-        signal: controller.signal
-      });
-      clearTimeout(timer);
-
-      if (res.ok) {
-        const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-        if (text) {
-          return {
-            reply: text,
-            provider: 'Google Gemini',
-            model: model
-          };
-        }
-      }
-    } catch (err) {
-      console.error(`[Gemini Error on ${model}]:`, err.message);
-    }
-  }
-  return null;
+  if (winner) return winner;
+  return await fetchGeminiModel('gemini-3.5-flash-lite', 3000, prompt, history);
 }
 
 // 3. Local / Cloud n8n Webhook Engine
@@ -258,7 +276,7 @@ async function callOllama(prompt, history) {
 
 // API: Main Chat Orchestrator (Multi-Tier Failover)
 app.post('/api/chat', async (req, res) => {
-  const { message, model = 'Ampolin Opus 3.5', sessionId = 'default_session', mode = 'chat' } = req.body;
+  const { message, model = 'Gemini 3.8 Flash', sessionId = 'default_session', mode = 'chat' } = req.body;
 
   if (!message || typeof message !== 'string') {
     return res.status(400).json({ error: 'Message is required' });
@@ -269,24 +287,22 @@ app.post('/api/chat', async (req, res) => {
 
   // Route according to user selection or tier fallback
   const modelLower = (model || '').toLowerCase();
-  if (modelLower.includes('claude') || modelLower.includes('sonnet') || modelLower.includes('anthropic') || modelLower.includes('opus')) {
-    result = await callClaude(message, history, model);
-    if (!result) result = await callGroq(message, history, 'openai/gpt-oss-120b');
-    if (!result) result = await callGemini(message, history);
-  } else if (modelLower.includes('gemini')) {
-    result = await callGemini(message, history) || await callGroq(message, history, model);
+  if (modelLower.includes('gemini') || !model) {
+    result = await callGemini(message, history) || await callGroq(message, history, 'openai/gpt-oss-120b');
+  } else if (modelLower.includes('groq') || modelLower.includes('opus')) {
+    result = await callGroq(message, history, model) || await callGemini(message, history);
   } else if (modelLower.includes('n8n')) {
-    result = await callN8n(message, sessionId) || await callGroq(message, history, model);
+    result = await callN8n(message, sessionId) || await callGemini(message, history);
+  } else if (modelLower.includes('claude') || modelLower.includes('sonnet')) {
+    result = await callClaude(message, history, model) || await callGemini(message, history) || await callGroq(message, history);
   } else {
-    // Primary: Groq Cloud (ultra fast)
-    result = await callGroq(message, history, model);
-    // Tier 2: Claude Sonnet 5.5
-    if (!result) result = await callClaude(message, history, model);
-    // Tier 3: Gemini Cloud
-    if (!result) result = await callGemini(message, history);
-    // Tier 4: n8n Workflow
+    // Primary: Gemini 3.8 Flash
+    result = await callGemini(message, history);
+    // Tier 2: Groq Cloud
+    if (!result) result = await callGroq(message, history, model);
+    // Tier 3: n8n Workflow
     if (!result) result = await callN8n(message, sessionId);
-    // Tier 5: Ollama Local (Offline)
+    // Tier 4: Ollama Local (Offline)
     if (!result) result = await callOllama(message, history);
   }
 

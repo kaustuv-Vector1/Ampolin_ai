@@ -61,10 +61,10 @@
 </button>
 <!-- Center: Model Pill Selector with active indicator & chevron -->
 <button class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-black/[0.08] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:bg-black/[0.02] active:scale-95 transition-all" id="model-selector-btn">
-<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+<span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]"></span>
 <div class="flex items-center gap-1.5">
-<span class="font-display text-[13.5px] font-semibold text-[#141414] tracking-tight">Claude Sonnet 5.5</span>
-<span class="text-[10px] uppercase font-mono font-semibold px-1.5 py-0.5 rounded-full bg-emerald-900 text-white leading-none">Vertex</span>
+<span class="font-display text-[13.5px] font-semibold text-[#141414] tracking-tight">Gemini 3.8 Flash</span>
+<span class="text-[10px] uppercase font-mono font-semibold px-1.5 py-0.5 rounded-full bg-blue-600 text-white leading-none">1M</span>
 </div>
 <span class="material-symbols-outlined text-[17px] text-black/45 ml-0.5">expand_more</span>
 </button>
@@ -299,28 +299,28 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
 </div>
 <!-- Model Selection List -->
 <div class="space-y-2.5">
-<!-- Model 1: Claude Sonnet 5.5 (Active) -->
-<div class="p-3.5 rounded-2xl border-2 border-black bg-black/[0.02] flex items-start gap-3 cursor-pointer transition-all active:scale-[0.99]" data-model-name="Claude Sonnet 5.5" data-model-tier="Vertex">
-<div class="w-2.5 h-2.5 rounded-full bg-emerald-500 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+<!-- Model 1: Gemini 3.8 Flash (Active) -->
+<div class="p-3.5 rounded-2xl border-2 border-black bg-black/[0.02] flex items-start gap-3 cursor-pointer transition-all active:scale-[0.99]" data-model-name="Gemini 3.8 Flash" data-model-tier="Google">
+<div class="w-2.5 h-2.5 rounded-full bg-blue-500 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
 <div class="flex-1 min-w-0">
 <div class="flex items-center justify-between gap-1">
 <div class="flex items-center gap-1.5 truncate">
-<span class="text-[14px] font-semibold text-black truncate">Claude Sonnet 5.5</span>
-<span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded-full bg-emerald-900 text-white font-semibold">Vertex AI</span>
+<span class="text-[14px] font-semibold text-black truncate">Gemini 3.8 Flash</span>
+<span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded-full bg-blue-600 text-white font-semibold">1M Context</span>
 </div>
 <span class="material-symbols-outlined text-[18px] text-black">check_circle</span>
 </div>
-<p class="text-[12px] text-black/60 mt-1 leading-snug">Google Cloud Vertex AI enterprise tier. SOTA coding &amp; architectural reasoning.</p>
+<p class="text-[12px] text-black/60 mt-1 leading-snug">Google AI Studio enterprise reasoning. Ultra-fast multimodal &amp; coding intelligence.</p>
 </div>
 </div>
 <!-- Model 2: Ampolin Opus 3.5 -->
-<div class="p-3.5 rounded-2xl border border-black/10 hover:border-black/30 hover:bg-black/[0.01] flex items-start gap-3 cursor-pointer transition-all active:scale-[0.99]" data-model-name="Ampolin Opus 3.5" data-model-tier="Pro">
+<div class="p-3.5 rounded-2xl border border-black/10 hover:border-black/30 hover:bg-black/[0.01] flex items-start gap-3 cursor-pointer transition-all active:scale-[0.99]" data-model-name="Ampolin Opus 3.5" data-model-tier="Groq">
 <div class="w-2.5 h-2.5 rounded-full bg-neutral-300 mt-1.5 shrink-0"></div>
 <div class="flex-1 min-w-0">
 <div class="flex items-center justify-between gap-1">
 <div class="flex items-center gap-1.5 truncate">
 <span class="text-[14px] font-semibold text-[#1a1a1a] truncate">Ampolin Opus 3.5</span>
-<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-black/5 text-black/60 font-medium">Groq Cloud</span>
+<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-black/5 text-black/60 font-medium">Groq 120B</span>
 </div>
 <span class="material-symbols-outlined text-[18px] text-transparent">check_circle</span>
 </div>
@@ -548,7 +548,7 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
           }
         } catch (err) {
           const content = aiBubble.querySelector('.ai-content');
-          if (content) content.innerHTML = `<span class="text-red-500 text-xs">Error connecting to local server</span>`;
+          if (content) content.innerHTML = `<span class="text-red-500 text-xs">${escapeHtml(err.message || 'Error connecting to server. Please try again.')}</span>`;
         }
 
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });

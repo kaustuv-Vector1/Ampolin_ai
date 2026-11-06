@@ -17,62 +17,80 @@ Tone: Direct, intellectual, highly competent, clean formatting with markdown.`;
 const GROQ_KEY = process.env.GROQ_API_KEY;
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
-// 1. Anthropic Claude Engine via Google Cloud Vertex AI
-let vertexAnthropic = null;
-function getVertexAnthropic() {
-  if (!vertexAnthropic) {
-    try {
-      const projectId = process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT || 'ampolin-ai';
-      vertexAnthropic = new AnthropicVertex({
-        region: process.env.CLOUD_ML_REGION || 'global',
-        projectId: projectId
-      });
-    } catch (err) {
-      console.error('[Anthropic Vertex Init Error]:', err.message);
-    }
-  }
-  return vertexAnthropic;
-}
+// 1. Google Gemini Cloud Engine (Primary: 3.8 Flash with fast fallback to 3.5 Flash)
+async function fetchGeminiModel(modelName, timeoutMs, prompt, history) {
+  if (!GEMINI_KEY) return null;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-async function callClaude(prompt, history, modelName = 'claude-sonnet-5-5') {
+  const contents = [
+    ...history.slice(-10).map(h => ({
+      role: h.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: typeof h.content === 'string' ? h.content : JSON.stringify(h.content) }]
+    })),
+    { role: 'user', parts: [{ text: prompt }] }
+  ];
+
   try {
-    const client = getVertexAnthropic();
-    if (!client) return null;
-
-    const messages = [
-      ...history.slice(-10).map(h => ({
-        role: h.role === 'assistant' ? 'assistant' : 'user',
-        content: typeof h.content === 'string' ? h.content : JSON.stringify(h.content)
-      })),
-      { role: 'user', content: prompt }
-    ];
-
-    const res = await client.messages.create({
-      model: 'claude-sonnet-5-5',
-      max_tokens: 4096,
-      system: SYSTEM_PROMPT,
-      messages: messages
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: contents,
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 4096
+        }
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timer);
 
-    if (res?.content?.[0]?.text) {
-      return {
-        reply: res.content[0].text.trim(),
-        provider: 'Anthropic Claude (Vertex AI)',
-        model: 'Claude Sonnet 5.5'
-      };
+    if (res.ok) {
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (text) {
+        return {
+          reply: text,
+          provider: 'Google Gemini',
+          model: modelName.replace('gemini-', 'Gemini ').replace('-preview', '')
+        };
+      }
     }
   } catch (err) {
-    console.error('[Claude Vertex Execution Error]:', err.message);
+    clearTimeout(timer);
   }
   return null;
 }
 
-// 2. Groq Cloud Engine
+async function callGemini(prompt, history) {
+  if (!GEMINI_KEY) return null;
+
+  // Staggered race: Give Gemini 3.8 Flash 1200ms headstart. If still pending, race with Gemini 3.5 Flash!
+  const p38 = fetchGeminiModel('gemini-3.8-flash', 3500, prompt, history);
+  const headstart = new Promise(resolve => setTimeout(resolve, 1200));
+
+  const fast38 = await Promise.race([p38, headstart.then(() => null)]);
+  if (fast38) return fast38;
+
+  const p35 = fetchGeminiModel('gemini-3.5-flash', 4000, prompt, history);
+  const winner = await Promise.race([
+    p38.then(r => r || new Promise(() => {})),
+    p35.then(r => r || new Promise(() => {})),
+    new Promise(r => setTimeout(() => r(null), 4500))
+  ]);
+
+  if (winner) return winner;
+  return await fetchGeminiModel('gemini-3.5-flash-lite', 3000, prompt, history);
+}
+
+// 2. Groq Cloud Engine (Ultra-fast 120B reasoning)
 async function callGroq(prompt, history, modelName = 'openai/gpt-oss-120b') {
   if (!GROQ_KEY) return null;
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 12000);
+    const timer = setTimeout(() => controller.abort(), 9000);
 
     const messages = [
       { role: 'system', content: SYSTEM_PROMPT },
@@ -112,60 +130,38 @@ async function callGroq(prompt, history, modelName = 'openai/gpt-oss-120b') {
   return null;
 }
 
-// 2. Gemini Cloud Engine
-async function callGemini(prompt, history) {
-  if (!GEMINI_KEY) return null;
-  const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
-
-  for (const model of modelsToTry) {
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 12000);
-
-      const contents = [
+// 3. Optional Claude Vertex (Single fast call, no hanging loops)
+async function callClaude(prompt, history) {
+  try {
+    const client = new AnthropicVertex({ region: 'us-east5', projectId: 'ampolin-ai' });
+    const res = await client.messages.create({
+      model: 'claude-sonnet-5-5',
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      messages: [
         ...history.slice(-10).map(h => ({
-          role: h.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: h.content }]
+          role: h.role === 'assistant' ? 'assistant' : 'user',
+          content: typeof h.content === 'string' ? h.content : JSON.stringify(h.content)
         })),
-        { role: 'user', parts: [{ text: prompt }] }
-      ];
-
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          contents: contents,
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 4096
-          }
-        }),
-        signal: controller.signal
-      });
-      clearTimeout(timer);
-
-      if (res.ok) {
-        const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-        if (text) {
-          return {
-            reply: text,
-            provider: 'Google Gemini',
-            model: model
-          };
-        }
-      }
-    } catch (err) {
-      console.error(`[Functions Gemini Error on ${model}]:`, err.message);
+        { role: 'user', content: prompt }
+      ]
+    });
+    if (res?.content?.[0]?.text) {
+      return {
+        reply: res.content[0].text.trim(),
+        provider: 'Anthropic Claude (Vertex AI)',
+        model: 'Claude Sonnet 5.5'
+      };
     }
+  } catch (err) {
+    console.error('[Claude Vertex single call failed]:', err.message);
   }
   return null;
 }
 
 // Route: /api/chat or /chat
 app.post(['/api/chat', '/chat'], async (req, res) => {
-  const { message, model = 'Claude Sonnet 5.5', history = [] } = req.body;
+  const { message, model = 'Gemini 3.8 Flash', history = [] } = req.body;
   if (!message || typeof message !== 'string') {
     return res.status(400).json({ error: 'Message is required' });
   }
@@ -173,18 +169,20 @@ app.post(['/api/chat', '/chat'], async (req, res) => {
   const modelLower = (model || '').toLowerCase();
   let result = null;
 
-  // 1. If Claude requested, call Vertex AI Claude first
-  if (modelLower.includes('claude') || modelLower.includes('sonnet') || modelLower.includes('anthropic') || modelLower.includes('opus')) {
-    result = await callClaude(message, history, model);
+  // Primary: Gemini 3.8 Flash (with 3.5 Flash & Groq failover)
+  if (modelLower.includes('gemini') || !model) {
+    result = await callGemini(message, history);
     if (!result) result = await callGroq(message, history, 'openai/gpt-oss-120b');
+  } else if (modelLower.includes('groq') || modelLower.includes('opus')) {
+    result = await callGroq(message, history, 'openai/gpt-oss-120b');
     if (!result) result = await callGemini(message, history);
-  } else if (modelLower.includes('gemini')) {
-    result = await callGemini(message, history) || await callGroq(message, history, model);
+  } else if (modelLower.includes('claude') || modelLower.includes('sonnet')) {
+    result = await callClaude(message, history);
+    if (!result) result = await callGemini(message, history);
+    if (!result) result = await callGroq(message, history, 'openai/gpt-oss-120b');
   } else {
-    // Default / Groq
-    result = await callGroq(message, history, model);
-    if (!result) result = await callClaude(message, history, model);
-    if (!result) result = await callGemini(message, history);
+    result = await callGemini(message, history);
+    if (!result) result = await callGroq(message, history, model);
   }
 
   if (!result || !result.reply) {
@@ -203,9 +201,9 @@ app.post(['/api/chat', '/chat'], async (req, res) => {
 app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     status: 'online',
-    claude: 'Anthropic Claude Sonnet 5.5 (Vertex AI)',
-    groq: Boolean(GROQ_KEY),
+    primaryModel: 'Google Gemini 3.8 Flash',
     gemini: Boolean(GEMINI_KEY),
+    groq: Boolean(GROQ_KEY),
     cloud: 'Firebase 2nd Gen Cloud Functions',
     timestamp: new Date().toISOString()
   });
