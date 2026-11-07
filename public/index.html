@@ -110,97 +110,27 @@
 <input class="w-full bg-neutral-50/80 hover:bg-neutral-100/70 focus:bg-white rounded-lg pl-9 pr-3 py-1.5 text-xs text-neutral-800 placeholder:text-neutral-400 border border-transparent focus:border-neutral-300 focus:outline-none transition-colors" id="chat-search" placeholder="Search conversations..." type="text"/>
 </div>
 </div>
-<!-- Workspaces & History Lists -->
-<div class="flex-1 overflow-y-auto px-3 py-1 space-y-5 text-xs">
-<!-- Workspaces -->
-<div class="space-y-1">
-<div class="px-2 py-1 flex items-center justify-between text-[11px] font-semibold tracking-wider uppercase text-neutral-400">
-<span>Workspaces</span>
-<span class="material-symbols-outlined text-sm cursor-pointer hover:text-neutral-800">add</span>
-</div>
-<nav class="space-y-0.5">
-<a class="workspace-nav-item flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/80 transition-colors group" href="#">
-<span class="material-symbols-outlined text-[17px] text-neutral-400 group-hover:text-black">folder</span>
-<span class="font-medium text-xs truncate">Research &amp; Strategy</span>
-</a>
-<a class="workspace-nav-item flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/80 transition-colors group" href="#">
-<span class="material-symbols-outlined text-[17px] text-neutral-400 group-hover:text-black">terminal</span>
-<span class="font-medium text-xs truncate">Engineering Core</span>
-</a>
-<a class="workspace-nav-item flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/80 transition-colors group" href="#">
-<span class="material-symbols-outlined text-[17px] text-neutral-400 group-hover:text-black">hub</span>
-<span class="font-medium text-xs truncate">Autonomous Agents</span>
-</a>
-</nav>
-</div>
-<!-- Today -->
-<div class="space-y-1">
-<div class="px-2 py-1 text-[11px] font-semibold tracking-wider uppercase text-neutral-400">
-            Today
-          </div>
-<nav class="space-y-0.5" id="history-today">
-<a class="chat-history-item active flex items-center justify-between px-2.5 py-2 rounded-lg bg-neutral-100 text-neutral-900 font-medium transition-colors group" href="#">
-<span class="truncate">Ampolin Opus reasoning benchmark</span>
-<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
-</a>
-<a class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors group" href="#">
-<span class="truncate">Substrate architecture review</span>
-<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
-</a>
-</nav>
-</div>
-<!-- Yesterday -->
-<div class="space-y-1">
-<div class="px-2 py-1 text-[11px] font-semibold tracking-wider uppercase text-neutral-400">
-            Yesterday
-          </div>
-<nav class="space-y-0.5">
-<a class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors group" href="#">
-<span class="truncate">Distributed KV store schema design</span>
-<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
-</a>
-<a class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors group" href="#">
-<span class="truncate">Tailwind semantic tokens refactoring</span>
-<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
-</a>
-</nav>
-</div>
-<!-- Previous 7 Days -->
-<div class="space-y-1">
-<div class="px-2 py-1 text-[11px] font-semibold tracking-wider uppercase text-neutral-400">
-            Previous 7 Days
-          </div>
-<nav class="space-y-0.5">
-<a class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors group" href="#">
-<span class="truncate">Vector search similarity indices</span>
-<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
-</a>
-<a class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors group" href="#">
-<span class="truncate">Gemini Flash reasoning pipeline</span>
-<span class="material-symbols-outlined text-neutral-400 text-sm opacity-0 group-hover:opacity-100 hover:text-black transition-opacity">more_horiz</span>
-</a>
-</nav>
+<!-- Real History List Container -->
+<div class="flex-1 overflow-y-auto px-3 py-1 space-y-4 text-xs" id="chat-history-container">
+  <!-- Dynamically Populated by ChatHistoryManager -->
 </div>
 </div>
+<!-- Sidebar Footer with Interactive Profile & PFP -->
+<div class="p-3 border-t border-gray-100 bg-white">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-neutral-100 cursor-pointer flex-1 min-w-0 transition-colors group" id="btn-user-profile" title="Customize Profile & PFP">
+<div class="relative w-8 h-8 shrink-0">
+<img alt="Profile" id="sidebar-user-avatar" class="w-8 h-8 rounded-full border border-gray-200 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80"/>
+<div class="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white text-[13px]">photo_camera</span>
 </div>
-<!-- Sidebar Footer -->
-<div class="p-3 border-t border-gray-100 bg-white space-y-2">
-<div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-neutral-50 border border-gray-200/70 text-xs">
-<div class="flex items-center gap-2">
-<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-<span class="font-mono text-[11px] text-neutral-700">Cluster: us-east-prod</span>
 </div>
-<span class="text-[10px] font-mono text-neutral-400 font-medium">99.9%</span>
-</div>
-<div class="flex items-center justify-between pt-1">
-<div class="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-neutral-100 cursor-pointer flex-1 min-w-0 transition-colors">
-<img alt="Profile" class="w-8 h-8 rounded-full border border-gray-200 object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1VoLoAFSyUZXXi_rU0yqqTXjM00fvYiNvleLuY3UGUPLO9tVuVITtlmtQA61TgrJVjkRiYBWGpX49seMkyv5Vazp8ihC-FNGPAv8rgOZRw9MO6gJDXJSUe162keO64yZebiCwYVpiFnjH3fg5N7B0RHW620ZLNkLtmG3SjT-GK-nbph5g8xrMJpMy3aaYJKnVjWV1OLc0yVKyY3Jc_wrw_ZEK2zG7kxijSZWxJfqcrE"/>
 <div class="flex flex-col min-w-0">
-<span class="font-display font-semibold text-xs text-neutral-900 truncate">Principal Architect</span>
-<span class="text-[10px] text-neutral-500 font-medium truncate">Enterprise Pro Tier</span>
+<span class="font-display font-semibold text-xs text-neutral-900 truncate" id="sidebar-user-name">Principal Architect</span>
+<span class="text-[10px] text-neutral-500 font-medium truncate" id="sidebar-user-role">Enterprise Pro Tier</span>
 </div>
 </div>
-<button class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors" title="Settings">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer" title="Edit Profile & PFP" id="btn-open-profile-settings">
 <span class="material-symbols-outlined text-lg">tune</span>
 </button>
 </div>
@@ -512,6 +442,138 @@
         });
       }
 
+      // Profile & Avatar Manager
+      const DEFAULT_PFP = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80';
+      const ProfileManager = {
+        getPfp() {
+          return localStorage.getItem('ampolin_user_pfp') || DEFAULT_PFP;
+        },
+        getName() {
+          return localStorage.getItem('ampolin_user_name') || 'Principal Architect';
+        },
+        getRole() {
+          return localStorage.getItem('ampolin_user_role') || 'Enterprise Pro Tier';
+        },
+        save(pfp, name, role) {
+          if (pfp) localStorage.setItem('ampolin_user_pfp', pfp);
+          if (name) localStorage.setItem('ampolin_user_name', name.trim());
+          if (role) localStorage.setItem('ampolin_user_role', role.trim());
+          this.syncUI();
+        },
+        resetPfp() {
+          localStorage.setItem('ampolin_user_pfp', DEFAULT_PFP);
+          this.syncUI();
+        },
+        syncUI() {
+          const pfp = this.getPfp();
+          const name = this.getName();
+          const role = this.getRole();
+
+          const sidebarAvatar = document.getElementById('sidebar-user-avatar');
+          const sidebarName = document.getElementById('sidebar-user-name');
+          const sidebarRole = document.getElementById('sidebar-user-role');
+          const modalPreview = document.getElementById('profile-preview-img');
+
+          if (sidebarAvatar) sidebarAvatar.src = pfp;
+          if (sidebarName) sidebarName.textContent = name;
+          if (sidebarRole) sidebarRole.textContent = role;
+          if (modalPreview) modalPreview.src = pfp;
+
+          // Update any user avatars in active feed
+          document.querySelectorAll('.user-chat-avatar').forEach(img => {
+            img.src = pfp;
+          });
+        }
+      };
+
+      // Real Chat History Manager
+      const ChatHistoryManager = {
+        STORAGE_KEY: 'ampolin_chat_sessions_v1',
+        ACTIVE_KEY: 'ampolin_active_chat_id',
+
+        getAll() {
+          try {
+            const raw = localStorage.getItem(this.STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+          } catch (e) {
+            return [];
+          }
+        },
+
+        saveAll(chats) {
+          try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(chats));
+          } catch (e) {
+            console.error('Failed to save chat sessions:', e);
+          }
+        },
+
+        getActiveId() {
+          return localStorage.getItem(this.ACTIVE_KEY) || null;
+        },
+
+        setActiveId(id) {
+          if (id) {
+            localStorage.setItem(this.ACTIVE_KEY, id);
+          } else {
+            localStorage.removeItem(this.ACTIVE_KEY);
+          }
+        },
+
+        getChat(id) {
+          return this.getAll().find(c => c.id === id) || null;
+        },
+
+        createChat(firstUserMessage, model) {
+          const chats = this.getAll();
+          const id = 'chat_' + Date.now();
+          const cleanTitle = firstUserMessage.trim().replace(/^Initiate\s+/i, '');
+          const title = cleanTitle.length > 34 ? cleanTitle.slice(0, 34) + '...' : cleanTitle;
+
+          const newChat = {
+            id: id,
+            title: title || 'New Conversation',
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            model: model || 'Gemini 3.8 Flash',
+            messages: [
+              { role: 'user', content: firstUserMessage, timestamp: Date.now() }
+            ]
+          };
+
+          chats.unshift(newChat);
+          this.saveAll(chats);
+          this.setActiveId(id);
+          return newChat;
+        },
+
+        appendMessage(chatId, messageObj) {
+          const chats = this.getAll();
+          const idx = chats.findIndex(c => c.id === chatId);
+          if (idx !== -1) {
+            chats[idx].messages.push({
+              ...messageObj,
+              timestamp: Date.now()
+            });
+            chats[idx].updatedAt = Date.now();
+            const updated = chats.splice(idx, 1)[0];
+            chats.unshift(updated);
+            this.saveAll(chats);
+            return updated;
+          }
+          return null;
+        },
+
+        deleteChat(id) {
+          let chats = this.getAll();
+          chats = chats.filter(c => c.id !== id);
+          this.saveAll(chats);
+          if (this.getActiveId() === id) {
+            this.setActiveId(null);
+          }
+        }
+      };
+
       // Conversational Feed Container
       let chatFeed = document.getElementById('chat-feed');
       if (!chatFeed) {
@@ -520,6 +582,186 @@
         chatFeed.id = 'chat-feed';
         chatFeed.className = 'w-full space-y-4 mb-6 hidden';
         composerParent.parentNode.insertBefore(chatFeed, composerParent);
+      }
+
+      function startNewChat() {
+        ChatHistoryManager.setActiveId(null);
+        if (chatFeed) {
+          chatFeed.innerHTML = '';
+          chatFeed.classList.add('hidden');
+        }
+        const capGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2');
+        if (capGrid) capGrid.parentElement.classList.remove('hidden');
+
+        if (textarea) {
+          textarea.value = '';
+          textarea.style.height = 'auto';
+          textarea.focus();
+          if (tokenCounter) tokenCounter.textContent = '0 / 200k';
+        }
+        renderChatHistory(document.getElementById('chat-search')?.value || '');
+      }
+
+      function loadChat(id) {
+        const chat = ChatHistoryManager.getChat(id);
+        if (!chat) return;
+
+        ChatHistoryManager.setActiveId(id);
+        const capGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2');
+        if (capGrid) capGrid.parentElement.classList.add('hidden');
+
+        const userPfp = ProfileManager.getPfp();
+
+        if (chatFeed) {
+          chatFeed.classList.remove('hidden');
+          chatFeed.innerHTML = '';
+
+          chat.messages.forEach(msg => {
+            if (msg.role === 'user') {
+              const userCard = document.createElement('div');
+              userCard.className = 'flex items-start gap-3 justify-end';
+              userCard.innerHTML = `
+                <div class="max-w-2xl bg-neutral-900 text-white rounded-2xl p-4 shadow-sm space-y-1">
+                  <div class="text-[11px] font-mono text-neutral-400">You</div>
+                  <div class="text-sm font-sans whitespace-pre-wrap leading-relaxed">${escapeHtml(msg.content)}</div>
+                </div>
+                <img src="${escapeHtml(userPfp)}" alt="Me" class="user-chat-avatar w-8 h-8 rounded-full object-cover shrink-0 border border-neutral-300 shadow-2xs" />
+              `;
+              chatFeed.appendChild(userCard);
+            } else {
+              const aiCard = document.createElement('div');
+              aiCard.className = 'flex items-start gap-3';
+              aiCard.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-xs shrink-0">A</div>
+                <div class="max-w-2xl flex-1 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-2">
+                  <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+                    <span class="text-xs font-semibold text-neutral-900">Ampolin AI</span>
+                    <span class="text-[10px] font-mono text-neutral-400 flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      <span>${escapeHtml(msg.provider || 'AI Core')} • ${escapeHtml(msg.model || chat.model || 'Gemini 3.8 Flash')}</span>
+                    </span>
+                  </div>
+                  <div class="ai-reply-content text-sm font-sans text-neutral-800 leading-relaxed space-y-2">
+                    ${formatMarkdown(msg.content)}
+                  </div>
+                </div>
+              `;
+              chatFeed.appendChild(aiCard);
+            }
+          });
+
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        renderChatHistory(document.getElementById('chat-search')?.value || '');
+      }
+
+      function renderChatHistory(filterQuery = '') {
+        const container = document.getElementById('chat-history-container');
+        if (!container) return;
+
+        const chats = ChatHistoryManager.getAll();
+        const activeId = ChatHistoryManager.getActiveId();
+
+        const query = (filterQuery || '').toLowerCase().trim();
+        const filtered = query
+          ? chats.filter(c => (c.title || '').toLowerCase().includes(query) || (c.messages || []).some(m => (m.content || '').toLowerCase().includes(query)))
+          : chats;
+
+        if (filtered.length === 0) {
+          if (query) {
+            container.innerHTML = `
+              <div class="px-3 py-6 text-center text-neutral-400 space-y-1">
+                <span class="material-symbols-outlined text-xl text-neutral-300">search_off</span>
+                <p class="text-[11px] font-medium text-neutral-500">No chats match &ldquo;${escapeHtml(query)}&rdquo;</p>
+              </div>
+            `;
+          } else {
+            container.innerHTML = `
+              <div class="px-3 py-8 text-center text-neutral-400 space-y-1.5">
+                <span class="material-symbols-outlined text-2xl text-neutral-300">chat_bubble_outline</span>
+                <p class="text-[11.5px] font-semibold text-neutral-600">No conversations yet</p>
+                <p class="text-[10.5px] text-neutral-400">Click &ldquo;New chat&rdquo; to start</p>
+              </div>
+            `;
+          }
+          return;
+        }
+
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const yesterdayStart = todayStart - 86400000;
+        const weekStart = todayStart - 6 * 86400000;
+
+        const groups = {
+          'Today': [],
+          'Yesterday': [],
+          'Previous 7 Days': [],
+          'Older': []
+        };
+
+        filtered.forEach(chat => {
+          const time = chat.updatedAt || chat.createdAt || 0;
+          if (time >= todayStart) {
+            groups['Today'].push(chat);
+          } else if (time >= yesterdayStart) {
+            groups['Yesterday'].push(chat);
+          } else if (time >= weekStart) {
+            groups['Previous 7 Days'].push(chat);
+          } else {
+            groups['Older'].push(chat);
+          }
+        });
+
+        let html = '';
+        Object.entries(groups).forEach(([groupName, groupChats]) => {
+          if (groupChats.length === 0) return;
+          html += `
+            <div class="space-y-1">
+              <div class="px-2 py-1 text-[11px] font-semibold tracking-wider uppercase text-neutral-400">${escapeHtml(groupName)}</div>
+              <nav class="space-y-0.5">
+          `;
+          groupChats.forEach(c => {
+            const isActive = c.id === activeId;
+            html += `
+              <div class="chat-history-item flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer transition-colors group ${isActive ? 'bg-neutral-100 text-neutral-900 font-semibold' : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 font-normal'}" data-chat-id="${escapeHtml(c.id)}">
+                <span class="truncate flex-1 text-xs select-none pr-1">${escapeHtml(c.title || 'Untitled conversation')}</span>
+                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button type="button" class="delete-chat-btn p-1 rounded hover:bg-neutral-200 text-neutral-400 hover:text-red-600 transition-colors" title="Delete conversation" data-id="${escapeHtml(c.id)}">
+                    <span class="material-symbols-outlined text-[15px]">delete</span>
+                  </button>
+                </div>
+              </div>
+            `;
+          });
+          html += `
+              </nav>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+
+        container.querySelectorAll('.chat-history-item').forEach(el => {
+          el.addEventListener('click', (e) => {
+            if (e.target.closest('.delete-chat-btn')) return;
+            const id = el.getAttribute('data-chat-id');
+            loadChat(id);
+          });
+        });
+
+        container.querySelectorAll('.delete-chat-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.getAttribute('data-id');
+            ChatHistoryManager.deleteChat(id);
+            if (ChatHistoryManager.getActiveId() === id) {
+              startNewChat();
+            } else {
+              renderChatHistory(document.getElementById('chat-search')?.value || '');
+            }
+          });
+        });
       }
 
       async function executeSend() {
@@ -536,7 +778,20 @@
         const capGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2');
         if (capGrid) capGrid.parentElement.classList.add('hidden');
 
-        // Append User Message
+        // Manage Real Chat History Session
+        const currentModel = currentModelLabel ? currentModelLabel.textContent.trim() : 'Gemini 3.8 Flash';
+        let activeId = ChatHistoryManager.getActiveId();
+        if (!activeId) {
+          const newChat = ChatHistoryManager.createChat(messageText, currentModel);
+          activeId = newChat.id;
+          renderChatHistory();
+        } else {
+          ChatHistoryManager.appendMessage(activeId, { role: 'user', content: messageText });
+          renderChatHistory();
+        }
+
+        // Append User Message with User PFP
+        const userPfp = ProfileManager.getPfp();
         const userCard = document.createElement('div');
         userCard.className = 'flex items-start gap-3 justify-end';
         userCard.innerHTML = `
@@ -544,12 +799,10 @@
             <div class="text-[11px] font-mono text-neutral-400">You • Just now</div>
             <div class="text-sm font-sans whitespace-pre-wrap leading-relaxed">${escapeHtml(messageText)}</div>
           </div>
-          <div class="w-8 h-8 rounded-full bg-neutral-200 text-neutral-800 flex items-center justify-center font-bold text-xs shrink-0">ME</div>
+          <img src="${escapeHtml(userPfp)}" alt="Me" class="user-chat-avatar w-8 h-8 rounded-full object-cover shrink-0 border border-neutral-300 shadow-2xs" />
         `;
         chatFeed.appendChild(userCard);
 
-        // Append Assistant Placeholder Card
-        const currentModel = currentModelLabel ? currentModelLabel.textContent.trim() : 'Gemini 3.8 Flash';
         const ollamaEndpoint = localStorage.getItem('ampolin_ollama_endpoint') || 'http://localhost:11434';
         const ollamaModel = localStorage.getItem('ampolin_ollama_model') || 'qwen2.5:latest';
 
@@ -676,6 +929,15 @@
             modelTag.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${escapeHtml(replyData.provider || 'AI Core')} • ${escapeHtml(replyData.model || currentModel)}`;
           }
           replyBox.innerHTML = formatMarkdown(replyData.reply);
+
+          // Save AI Response to Chat History
+          ChatHistoryManager.appendMessage(activeId, {
+            role: 'assistant',
+            content: replyData.reply,
+            provider: replyData.provider,
+            model: replyData.model
+          });
+          renderChatHistory(document.getElementById('chat-search')?.value || '');
         }
 
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -1020,44 +1282,203 @@
         }
       });
 
-      // Navigation tabs switching
-      tabBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-          tabBtns.forEach(b => {
-            b.classList.remove('text-neutral-900', 'font-semibold', 'border-black');
-            b.classList.add('text-neutral-500', 'font-medium', 'border-transparent');
-          });
-          this.classList.remove('text-neutral-500', 'font-medium', 'border-transparent');
-          this.classList.add('text-neutral-900', 'font-semibold', 'border-black');
-        });
+      // Profile Modal Wiring
+      const profileModal = document.getElementById('profile-modal');
+      const closeProfileBtn = document.getElementById('close-profile-modal');
+      const cancelProfileBtn = document.getElementById('btn-cancel-profile');
+      const saveProfileBtn = document.getElementById('btn-save-profile');
+      const openProfileBtn = document.getElementById('btn-user-profile');
+      const openSettingsBtn = document.getElementById('btn-open-profile-settings');
+      const triggerUploadBtn = document.getElementById('btn-trigger-upload');
+      const pfpFileInput = document.getElementById('pfp-file-input');
+      const pfpUrlInput = document.getElementById('pfp-url-input');
+      const resetPfpBtn = document.getElementById('btn-reset-pfp');
+      const previewImg = document.getElementById('profile-preview-img');
+      const nameInput = document.getElementById('profile-name-input');
+      const roleInput = document.getElementById('profile-role-input');
+
+      function openProfileModal() {
+        if (!profileModal) return;
+        profileModal.classList.remove('hidden');
+        profileModal.classList.add('flex');
+        if (previewImg) previewImg.src = ProfileManager.getPfp();
+        if (nameInput) nameInput.value = ProfileManager.getName();
+        if (roleInput) roleInput.value = ProfileManager.getRole();
+        if (pfpUrlInput) pfpUrlInput.value = '';
+      }
+
+      function closeProfileModal() {
+        if (!profileModal) return;
+        profileModal.classList.add('hidden');
+        profileModal.classList.remove('flex');
+      }
+
+      openProfileBtn?.addEventListener('click', openProfileModal);
+      openSettingsBtn?.addEventListener('click', openProfileModal);
+      closeProfileBtn?.addEventListener('click', closeProfileModal);
+      cancelProfileBtn?.addEventListener('click', closeProfileModal);
+      profileModal?.addEventListener('click', (e) => {
+        if (e.target === profileModal) closeProfileModal();
       });
 
-      // Chat history item selection
-      chatItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-          e.preventDefault();
-          chatItems.forEach(i => {
-            i.classList.remove('bg-neutral-100', 'text-neutral-900', 'font-medium');
-            i.classList.add('text-neutral-600');
-          });
-          this.classList.remove('text-neutral-600');
-          this.classList.add('bg-neutral-100', 'text-neutral-900', 'font-medium');
-        });
+      triggerUploadBtn?.addEventListener('click', () => {
+        pfpFileInput?.click();
       });
 
-      // New Chat button
-      const newChatBtn = document.getElementById('btn-new-chat');
-      if (newChatBtn) {
-        newChatBtn.addEventListener('click', () => {
-          if (textarea) {
-            textarea.value = '';
-            textarea.focus();
-            if (tokenCounter) tokenCounter.textContent = '0 / 200k';
+      pfpFileInput?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Image size exceeds 5MB. Please choose a smaller image.');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (previewImg && event.target?.result) {
+            previewImg.src = event.target.result;
+          }
+          if (pfpUrlInput) pfpUrlInput.value = '';
+        };
+        reader.readAsDataURL(file);
+      });
+
+      pfpUrlInput?.addEventListener('input', function() {
+        const val = this.value.trim();
+        if (val && previewImg) previewImg.src = val;
+      });
+
+      document.querySelectorAll('.preset-avatar').forEach(avatar => {
+        avatar.addEventListener('click', function() {
+          const src = this.getAttribute('src');
+          if (previewImg && src) {
+            previewImg.src = src;
+            if (pfpUrlInput) pfpUrlInput.value = src;
           }
         });
+      });
+
+      resetPfpBtn?.addEventListener('click', () => {
+        if (previewImg) previewImg.src = DEFAULT_PFP;
+        if (pfpUrlInput) pfpUrlInput.value = '';
+      });
+
+      saveProfileBtn?.addEventListener('click', () => {
+        const newPfp = previewImg?.src || DEFAULT_PFP;
+        const newName = nameInput?.value?.trim() || 'Principal Architect';
+        const newRole = roleInput?.value?.trim() || 'Enterprise Pro Tier';
+        ProfileManager.save(newPfp, newName, newRole);
+        closeProfileModal();
+      });
+
+      // Search real chat history
+      const searchInput = document.getElementById('chat-search');
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          renderChatHistory(this.value);
+        });
       }
+
+      // New chat action
+      const newChatBtn = document.getElementById('btn-new-chat');
+      if (newChatBtn) {
+        newChatBtn.addEventListener('click', startNewChat);
+      }
+
+      // Global keyboard shortcuts
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          searchInput?.focus();
+        }
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'n') {
+          e.preventDefault();
+          startNewChat();
+        }
+      });
+
+      // Initial Boot: Sync Profile & Render History
+      ProfileManager.syncUI();
+      renderChatHistory();
     });
   </script>
+  <!-- Profile & Avatar Customizer Modal -->
+  <div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs hidden items-center justify-center p-4 transition-all duration-200" id="profile-modal">
+    <div class="w-full max-w-md bg-white rounded-2xl p-6 shadow-2xl border border-gray-200 space-y-5 animate-in fade-in duration-200">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg text-neutral-800">account_circle</span>
+          <h3 class="font-display font-bold text-base text-neutral-900">User Profile &amp; Avatar</h3>
+        </div>
+        <button class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer" id="close-profile-modal">
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+
+      <!-- Live Avatar Preview & Upload -->
+      <div class="flex items-center gap-4 p-3.5 bg-neutral-50 rounded-2xl border border-neutral-200/70">
+        <div class="relative w-16 h-16 shrink-0 group">
+          <img id="profile-preview-img" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Avatar Preview" />
+          <label for="pfp-file-input" class="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+            <span class="material-symbols-outlined text-sm">photo_camera</span>
+            <span class="text-[9px] font-medium">Upload</span>
+          </label>
+          <input type="file" id="pfp-file-input" accept="image/*" class="hidden" />
+        </div>
+        <div class="space-y-1.5 flex-1 min-w-0">
+          <div class="text-xs font-semibold text-neutral-900">Profile Picture (PFP)</div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btn-trigger-upload" class="px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-black text-white text-[11px] font-medium shadow-2xs transition-colors cursor-pointer flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs">upload</span>
+              Upload File
+            </button>
+            <button type="button" id="btn-reset-pfp" class="px-2.5 py-1 rounded-lg bg-white border border-gray-200 hover:bg-neutral-100 text-neutral-700 text-[11px] font-medium transition-colors cursor-pointer">
+              Default
+            </button>
+          </div>
+          <p class="text-[10px] text-neutral-400 truncate">PNG, JPG, WebP up to 5MB</p>
+        </div>
+      </div>
+
+      <!-- Image URL Input -->
+      <div>
+        <label class="block text-xs font-medium text-neutral-700 mb-1">Or Paste Image URL</label>
+        <input type="url" id="pfp-url-input" placeholder="https://..." class="w-full bg-neutral-50 border border-gray-200 rounded-xl px-3 py-2 text-xs text-neutral-800 focus:bg-white focus:border-neutral-900 focus:outline-none transition-colors" />
+      </div>
+
+      <!-- Preset Avatars -->
+      <div>
+        <div class="text-[10px] uppercase font-bold tracking-wider text-neutral-400 mb-2">Preset Avatars</div>
+        <div class="flex items-center gap-2.5 overflow-x-auto pb-1" id="pfp-preset-container">
+          <img class="preset-avatar w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-black cursor-pointer transition-all shrink-0" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Preset 1" />
+          <img class="preset-avatar w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-black cursor-pointer transition-all shrink-0" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" alt="Preset 2" />
+          <img class="preset-avatar w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-black cursor-pointer transition-all shrink-0" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80" alt="Preset 3" />
+          <img class="preset-avatar w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-black cursor-pointer transition-all shrink-0" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80" alt="Preset 4" />
+          <img class="preset-avatar w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-black cursor-pointer transition-all shrink-0" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80" alt="Preset 5" />
+        </div>
+      </div>
+
+      <!-- Name & Role Fields -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-neutral-700 mb-1">Display Name</label>
+          <input type="text" id="profile-name-input" value="Principal Architect" class="w-full bg-neutral-50 border border-gray-200 rounded-xl px-3 py-2 text-xs text-neutral-800 focus:bg-white focus:border-neutral-900 focus:outline-none transition-colors" placeholder="Your name" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-neutral-700 mb-1">Title / Role</label>
+          <input type="text" id="profile-role-input" value="Enterprise Pro Tier" class="w-full bg-neutral-50 border border-gray-200 rounded-xl px-3 py-2 text-xs text-neutral-800 focus:bg-white focus:border-neutral-900 focus:outline-none transition-colors" placeholder="e.g. Lead Engineer, Pro Tier" />
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="pt-2 flex items-center justify-end gap-2 border-t border-gray-100">
+        <button type="button" id="btn-cancel-profile" class="px-3.5 py-2 rounded-xl text-neutral-600 hover:text-neutral-900 text-xs font-medium cursor-pointer transition-colors">Cancel</button>
+        <button type="button" id="btn-save-profile" class="px-4 py-2 bg-neutral-900 hover:bg-black text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Ollama Local Node Configuration Modal -->
   <div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs hidden items-center justify-center p-4 transition-all duration-200" id="ollama-modal">
     <div class="w-full max-w-md bg-white rounded-2xl p-6 shadow-2xl border border-gray-200 space-y-4 animate-in fade-in duration-200">

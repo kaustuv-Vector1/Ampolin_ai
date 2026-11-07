@@ -219,66 +219,22 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
 <span class="text-[11px] text-black/40 font-mono">⌘N</span>
 </button>
 </div>
-<!-- Chat History List -->
-<div class="flex-1 overflow-y-auto px-3 py-2 space-y-4">
-<!-- Group: Today -->
-<div>
-<p class="px-2 pb-1.5 text-[11px] font-semibold tracking-wider uppercase text-black/40">Today</p>
-<div class="space-y-0.5">
-<button class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] text-[#1c1c1c] font-medium bg-black/[0.05] hover:bg-black/[0.07] transition-colors truncate">
-<span class="material-symbols-outlined text-[16px] text-black/50">chat_bubble_outline</span>
-<span class="truncate">Ampolin Opus reasoning benchmark</span>
-</button>
-<button class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] text-black/70 hover:text-black hover:bg-black/[0.03] transition-colors truncate">
-<span class="material-symbols-outlined text-[16px] text-black/40">chat_bubble_outline</span>
-<span class="truncate">Substrate architecture Rust review</span>
-</button>
+<!-- Chat History List (Real dynamic history) -->
+<div class="flex-1 overflow-y-auto px-3 py-2 space-y-2.5" id="mobile-chat-history-container">
+  <!-- Dynamically Populated by ChatHistoryManager -->
 </div>
-</div>
-<!-- Group: Yesterday -->
-<div>
-<p class="px-2 pb-1.5 text-[11px] font-semibold tracking-wider uppercase text-black/40">Yesterday</p>
-<div class="space-y-0.5">
-<button class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] text-black/70 hover:text-black hover:bg-black/[0.03] transition-colors truncate">
-<span class="material-symbols-outlined text-[16px] text-black/40">chat_bubble_outline</span>
-<span class="truncate">Q3 Financial Statement Delta</span>
-</button>
-<button class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] text-black/70 hover:text-black hover:bg-black/[0.03] transition-colors truncate">
-<span class="material-symbols-outlined text-[16px] text-black/40">chat_bubble_outline</span>
-<span class="truncate">Mobile iOS Navigation Shell Design</span>
-</button>
-<button class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] text-black/70 hover:text-black hover:bg-black/[0.03] transition-colors truncate">
-<span class="material-symbols-outlined text-[16px] text-black/40">chat_bubble_outline</span>
-<span class="truncate">Python Async Loop optimization</span>
-</button>
-</div>
-</div>
-<!-- Group: Workspaces -->
-<div>
-<p class="px-2 pb-1.5 text-[11px] font-semibold tracking-wider uppercase text-black/40">Workspaces</p>
-<div class="space-y-0.5">
-<button class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] text-black/70 hover:text-black hover:bg-black/[0.03] transition-colors truncate">
-<span class="material-symbols-outlined text-[16px] text-black/40">folder</span>
-<span class="truncate">Autonomous Core Pro</span>
-</button>
-<button class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-[13px] text-black/70 hover:text-black hover:bg-black/[0.03] transition-colors truncate">
-<span class="material-symbols-outlined text-[16px] text-black/40">folder</span>
-<span class="truncate">Artifacts &amp; Canvas Labs</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Drawer Footer Profile -->
+
+<!-- Drawer Footer Profile (Interactive PFP & Name) -->
 <div class="p-3 border-t border-black/[0.06] bg-black/[0.01]">
-<div class="flex items-center justify-between p-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer">
+<div class="flex items-center justify-between p-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer" id="mobile-btn-user-profile" title="Edit Profile & Avatar">
 <div class="flex items-center gap-2.5 min-w-0">
-<img alt="User avatar" class="w-8 h-8 rounded-full border border-black/10 shrink-0 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDn3xq-XFEFXTo6NL6RzsUo71aN-9sDyvHdthJqSjIrL3QyuZTW73lwA6lr2zukkNHruwn7TmbZIZTkfetdr7a2GTjnC097KggsGuIPvnjx4CI1v_2ZkiIV0eDUDWeTHdlu_FVywkQOChXSsn22bs2iT_0u7sqKqrepNj85LB5wAuFQrpVNMNpYaxKNBNthFGFmQwMDJTXsslhavTtIMHVcVw8OuT_BX7WS6IJpTK8Fls_Ln6eYtQEJ">
+<img alt="User avatar" id="mobile-user-avatar" class="w-8 h-8 rounded-full border border-black/10 shrink-0 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80">
 <div class="flex flex-col min-w-0">
-<span class="text-[13px] font-semibold text-[#141414] truncate">Ampolin Pro</span>
-<span class="text-[11px] text-black/40 truncate">Unlimited Compute</span>
+<span class="text-[13px] font-semibold text-[#141414] truncate" id="mobile-user-name">Principal Architect</span>
+<span class="text-[11px] text-black/40 truncate" id="mobile-user-role">Enterprise Pro Tier</span>
 </div>
 </div>
-<span class="material-symbols-outlined text-[18px] text-black/40">more_horiz</span>
+<span class="material-symbols-outlined text-[18px] text-black/40">tune</span>
 </div>
 </div>
 </aside>
@@ -453,18 +409,265 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
       openDrawerBtn?.addEventListener('click', openDrawer);
       closeDrawerBtn?.addEventListener('click', closeDrawer);
       backdrop?.addEventListener('click', closeDrawer);
+      // Profile & Avatar Manager (Synced with Desktop)
+      const DEFAULT_PFP = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80';
+      const ProfileManager = {
+        getPfp() {
+          return localStorage.getItem('ampolin_user_pfp') || DEFAULT_PFP;
+        },
+        getName() {
+          return localStorage.getItem('ampolin_user_name') || 'Principal Architect';
+        },
+        getRole() {
+          return localStorage.getItem('ampolin_user_role') || 'Enterprise Pro Tier';
+        },
+        save(pfp, name, role) {
+          if (pfp) localStorage.setItem('ampolin_user_pfp', pfp);
+          if (name) localStorage.setItem('ampolin_user_name', name.trim());
+          if (role) localStorage.setItem('ampolin_user_role', role.trim());
+          this.syncUI();
+        },
+        syncUI() {
+          const pfp = this.getPfp();
+          const name = this.getName();
+          const role = this.getRole();
+
+          const mobileAvatar = document.getElementById('mobile-user-avatar');
+          const mobileName = document.getElementById('mobile-user-name');
+          const mobileRole = document.getElementById('mobile-user-role');
+          const previewImg = document.getElementById('profile-preview-img');
+
+          if (mobileAvatar) mobileAvatar.src = pfp;
+          if (mobileName) mobileName.textContent = name;
+          if (mobileRole) mobileRole.textContent = role;
+          if (previewImg) previewImg.src = pfp;
+
+          document.querySelectorAll('.mobile-user-chat-avatar').forEach(img => {
+            img.src = pfp;
+          });
+        }
+      };
+
+      // Real Chat History Manager (Synced with Desktop)
+      const ChatHistoryManager = {
+        STORAGE_KEY: 'ampolin_chat_sessions_v1',
+        ACTIVE_KEY: 'ampolin_active_chat_id',
+
+        getAll() {
+          try {
+            const raw = localStorage.getItem(this.STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+          } catch (e) {
+            return [];
+          }
+        },
+
+        saveAll(chats) {
+          try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(chats));
+          } catch (e) {
+            console.error('Failed to save chat sessions:', e);
+          }
+        },
+
+        getActiveId() {
+          return localStorage.getItem(this.ACTIVE_KEY) || null;
+        },
+
+        setActiveId(id) {
+          if (id) {
+            localStorage.setItem(this.ACTIVE_KEY, id);
+          } else {
+            localStorage.removeItem(this.ACTIVE_KEY);
+          }
+        },
+
+        getChat(id) {
+          return this.getAll().find(c => c.id === id) || null;
+        },
+
+        createChat(firstUserMessage, model) {
+          const chats = this.getAll();
+          const id = 'chat_' + Date.now();
+          const cleanTitle = firstUserMessage.trim().replace(/^Initiate\s+/i, '');
+          const title = cleanTitle.length > 30 ? cleanTitle.slice(0, 30) + '...' : cleanTitle;
+
+          const newChat = {
+            id: id,
+            title: title || 'New Conversation',
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            model: model || 'Gemini 3.8 Flash',
+            messages: [
+              { role: 'user', content: firstUserMessage, timestamp: Date.now() }
+            ]
+          };
+
+          chats.unshift(newChat);
+          this.saveAll(chats);
+          this.setActiveId(id);
+          return newChat;
+        },
+
+        appendMessage(chatId, messageObj) {
+          const chats = this.getAll();
+          const idx = chats.findIndex(c => c.id === chatId);
+          if (idx !== -1) {
+            chats[idx].messages.push({
+              ...messageObj,
+              timestamp: Date.now()
+            });
+            chats[idx].updatedAt = Date.now();
+            const updated = chats.splice(idx, 1)[0];
+            chats.unshift(updated);
+            this.saveAll(chats);
+            return updated;
+          }
+          return null;
+        },
+
+        deleteChat(id) {
+          let chats = this.getAll();
+          chats = chats.filter(c => c.id !== id);
+          this.saveAll(chats);
+          if (this.getActiveId() === id) {
+            this.setActiveId(null);
+          }
+        }
+      };
+
+      function renderMobileHistory() {
+        const container = document.getElementById('mobile-chat-history-container');
+        if (!container) return;
+
+        const chats = ChatHistoryManager.getAll();
+        const activeId = ChatHistoryManager.getActiveId();
+
+        if (chats.length === 0) {
+          container.innerHTML = `
+            <div class="px-3 py-6 text-center text-black/40 space-y-1">
+              <span class="material-symbols-outlined text-xl text-black/30">chat_bubble_outline</span>
+              <p class="text-[12px] font-medium text-black/60">No chat history yet</p>
+              <p class="text-[10px] text-black/40">Start a new chat to begin</p>
+            </div>
+          `;
+          return;
+        }
+
+        let html = '';
+        chats.forEach(c => {
+          const isActive = c.id === activeId;
+          html += `
+            <div class="mobile-history-item flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${isActive ? 'bg-black/[0.07] text-black font-semibold' : 'text-black/75 hover:bg-black/[0.03]'}" data-chat-id="${escapeHtml(c.id)}">
+              <div class="flex items-center gap-2 truncate flex-1 pr-2">
+                <span class="material-symbols-outlined text-[15px] text-black/40">chat_bubble_outline</span>
+                <span class="truncate text-[13px]">${escapeHtml(c.title || 'Untitled conversation')}</span>
+              </div>
+              <button type="button" class="delete-chat-mobile-btn p-1 rounded text-black/40 hover:text-red-600 transition-colors" data-id="${escapeHtml(c.id)}" title="Delete chat">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+
+        container.querySelectorAll('.mobile-history-item').forEach(el => {
+          el.addEventListener('click', (e) => {
+            if (e.target.closest('.delete-chat-mobile-btn')) return;
+            const id = el.getAttribute('data-chat-id');
+            loadMobileChat(id);
+            closeDrawer();
+          });
+        });
+
+        container.querySelectorAll('.delete-chat-mobile-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.getAttribute('data-id');
+            ChatHistoryManager.deleteChat(id);
+            if (ChatHistoryManager.getActiveId() === id) {
+              startMobileNewChat();
+            } else {
+              renderMobileHistory();
+            }
+          });
+        });
+      }
+
+      function loadMobileChat(id) {
+        const chat = ChatHistoryManager.getChat(id);
+        if (!chat) return;
+
+        ChatHistoryManager.setActiveId(id);
+        if (mobileFeed) {
+          mobileFeed.classList.remove('hidden');
+          mobileFeed.innerHTML = '';
+        }
+        const starters = document.querySelector('.starter-card')?.parentElement;
+        if (starters) starters.classList.add('hidden');
+        const suggestions = document.querySelector('.suggestion-chip')?.closest('.overflow-x-auto');
+        if (suggestions) suggestions.classList.add('hidden');
+
+        const userPfp = ProfileManager.getPfp();
+
+        chat.messages.forEach(msg => {
+          if (msg.role === 'user') {
+            const uBubble = document.createElement('div');
+            uBubble.className = 'flex items-start gap-2 justify-end';
+            uBubble.innerHTML = `
+              <div class="bg-black text-white text-[14px] rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] shadow-xs leading-relaxed whitespace-pre-wrap">
+                ${escapeHtml(msg.content)}
+              </div>
+              <img src="${escapeHtml(userPfp)}" alt="Me" class="mobile-user-chat-avatar w-7 h-7 rounded-full object-cover shrink-0 border border-black/10 mt-0.5" />
+            `;
+            mobileFeed.appendChild(uBubble);
+          } else {
+            const aBubble = document.createElement('div');
+            aBubble.className = 'flex items-start gap-2.5';
+            aBubble.innerHTML = `
+              <div class="w-7 h-7 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">A</div>
+              <div class="bg-white border border-black/[0.08] text-[14px] text-neutral-900 rounded-2xl rounded-tl-sm p-3.5 max-w-[85%] shadow-xs space-y-1.5 leading-relaxed">
+                <div class="flex items-center gap-1.5 text-[10px] font-mono text-neutral-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>${escapeHtml(msg.provider || 'AI Core')} • ${escapeHtml(msg.model || chat.model || 'Gemini 3.8 Flash')}</span>
+                </div>
+                <div class="ai-content text-[13.5px]">
+                  ${formatMarkdown(msg.content)}
+                </div>
+              </div>
+            `;
+            mobileFeed.appendChild(aBubble);
+          }
+        });
+
+        renderMobileHistory();
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
+
+      function startMobileNewChat() {
+        ChatHistoryManager.setActiveId(null);
+        if (mobileFeed) {
+          mobileFeed.innerHTML = '';
+          mobileFeed.classList.add('hidden');
+        }
+        const starters = document.querySelector('.starter-card')?.parentElement;
+        if (starters) starters.classList.remove('hidden');
+        const suggestions = document.querySelector('.suggestion-chip')?.closest('.overflow-x-auto');
+        if (suggestions) suggestions.classList.remove('hidden');
+
+        if (chatInput) {
+          chatInput.value = '';
+          updateInputState();
+          chatInput.focus();
+        }
+        renderMobileHistory();
+      }
+
       drawerNewChat?.addEventListener('click', () => {
         closeDrawer();
-        resetChat();
+        startMobileNewChat();
       });
-
-      // New Chat
-      function resetChat() {
-        chatInput.value = '';
-        updateInputState();
-        chatInput.focus();
-      }
-      newChatBtn?.addEventListener('click', resetChat);
+      newChatBtn?.addEventListener('click', startMobileNewChat);
 
       // Input changes toggle Mic vs Send button
       function updateInputState() {
@@ -628,13 +831,26 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
         const suggestions = document.querySelector('.suggestion-chip')?.closest('.overflow-x-auto');
         if (suggestions) suggestions.classList.add('hidden');
 
-        // User bubble
+        // Manage Real Chat History Session
+        let activeId = ChatHistoryManager.getActiveId();
+        if (!activeId) {
+          const newChat = ChatHistoryManager.createChat(text, selectedMobileModel);
+          activeId = newChat.id;
+          renderMobileHistory();
+        } else {
+          ChatHistoryManager.appendMessage(activeId, { role: 'user', content: text });
+          renderMobileHistory();
+        }
+
+        // User bubble with custom PFP
+        const userPfp = ProfileManager.getPfp();
         const userBubble = document.createElement('div');
-        userBubble.className = 'flex justify-end';
+        userBubble.className = 'flex items-start gap-2 justify-end';
         userBubble.innerHTML = `
           <div class="bg-black text-white text-[14px] rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] shadow-xs leading-relaxed whitespace-pre-wrap">
             ${escapeHtml(text)}
           </div>
+          <img src="${escapeHtml(userPfp)}" alt="Me" class="mobile-user-chat-avatar w-7 h-7 rounded-full object-cover shrink-0 border border-black/10 mt-0.5" />
         `;
         mobileFeed.appendChild(userBubble);
 
@@ -741,10 +957,107 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
         if (replyData && replyData.reply) {
           if (status) status.textContent = `${replyData.provider || 'AI Core'} • ${replyData.model || selectedMobileModel}`;
           if (content) content.innerHTML = formatMarkdown(replyData.reply);
+
+          // Save AI Response to Chat History
+          ChatHistoryManager.appendMessage(activeId, {
+            role: 'assistant',
+            content: replyData.reply,
+            provider: replyData.provider,
+            model: replyData.model
+          });
+          renderMobileHistory();
         }
 
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
       }
+
+      // Profile Modal Wiring for Mobile
+      const profileModal = document.getElementById('profile-modal');
+      const closeProfileBtn = document.getElementById('close-profile-modal');
+      const cancelProfileBtn = document.getElementById('btn-cancel-profile');
+      const saveProfileBtn = document.getElementById('btn-save-profile');
+      const openProfileBtn = document.getElementById('mobile-btn-user-profile');
+      const triggerUploadBtn = document.getElementById('btn-trigger-upload');
+      const pfpFileInput = document.getElementById('pfp-file-input');
+      const pfpUrlInput = document.getElementById('pfp-url-input');
+      const resetPfpBtn = document.getElementById('btn-reset-pfp');
+      const previewImg = document.getElementById('profile-preview-img');
+      const nameInput = document.getElementById('profile-name-input');
+      const roleInput = document.getElementById('profile-role-input');
+
+      function openProfileModal() {
+        if (!profileModal) return;
+        profileModal.classList.remove('hidden');
+        profileModal.classList.add('flex');
+        if (previewImg) previewImg.src = ProfileManager.getPfp();
+        if (nameInput) nameInput.value = ProfileManager.getName();
+        if (roleInput) roleInput.value = ProfileManager.getRole();
+        if (pfpUrlInput) pfpUrlInput.value = '';
+      }
+
+      function closeProfileModal() {
+        if (!profileModal) return;
+        profileModal.classList.add('hidden');
+        profileModal.classList.remove('flex');
+      }
+
+      openProfileBtn?.addEventListener('click', openProfileModal);
+      closeProfileBtn?.addEventListener('click', closeProfileModal);
+      cancelProfileBtn?.addEventListener('click', closeProfileModal);
+      profileModal?.addEventListener('click', (e) => {
+        if (e.target === profileModal) closeProfileModal();
+      });
+
+      triggerUploadBtn?.addEventListener('click', () => pfpFileInput?.click());
+
+      pfpFileInput?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Image exceeds 5MB. Please choose a smaller photo.');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (previewImg && event.target?.result) {
+            previewImg.src = event.target.result;
+          }
+          if (pfpUrlInput) pfpUrlInput.value = '';
+        };
+        reader.readAsDataURL(file);
+      });
+
+      pfpUrlInput?.addEventListener('input', function() {
+        const val = this.value.trim();
+        if (val && previewImg) previewImg.src = val;
+      });
+
+      document.querySelectorAll('.preset-avatar').forEach(avatar => {
+        avatar.addEventListener('click', function() {
+          const src = this.getAttribute('src');
+          if (previewImg && src) {
+            previewImg.src = src;
+            if (pfpUrlInput) pfpUrlInput.value = src;
+          }
+        });
+      });
+
+      resetPfpBtn?.addEventListener('click', () => {
+        if (previewImg) previewImg.src = DEFAULT_PFP;
+        if (pfpUrlInput) pfpUrlInput.value = '';
+      });
+
+      saveProfileBtn?.addEventListener('click', () => {
+        const newPfp = previewImg?.src || DEFAULT_PFP;
+        const newName = nameInput?.value?.trim() || 'Principal Architect';
+        const newRole = roleInput?.value?.trim() || 'Enterprise Pro Tier';
+        ProfileManager.save(newPfp, newName, newRole);
+        closeProfileModal();
+      });
+
+      // Initial Sync
+      ProfileManager.syncUI();
+      renderMobileHistory();
 
       function escapeHtml(str) {
         return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -770,5 +1083,82 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
     })();
   </script>
 
+
+  <!-- Profile & Avatar Customizer Modal (Mobile) -->
+  <div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs hidden items-center justify-center p-4 transition-all duration-200" id="profile-modal">
+    <div class="w-full max-w-md bg-white rounded-2xl p-6 shadow-2xl border border-black/10 space-y-4 animate-in fade-in duration-200">
+      <div class="flex items-center justify-between border-b border-black/5 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg text-black">account_circle</span>
+          <h3 class="font-display font-bold text-base text-black">User Profile &amp; Avatar</h3>
+        </div>
+        <button class="w-8 h-8 rounded-lg flex items-center justify-center text-black/40 hover:text-black hover:bg-black/5 transition-colors cursor-pointer" id="close-profile-modal">
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+
+      <!-- Avatar Preview & Upload -->
+      <div class="flex items-center gap-4 p-3.5 bg-black/[0.02] rounded-2xl border border-black/[0.06]">
+        <div class="relative w-16 h-16 shrink-0 group">
+          <img id="profile-preview-img" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Avatar Preview" />
+          <label for="pfp-file-input" class="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+            <span class="material-symbols-outlined text-sm">photo_camera</span>
+            <span class="text-[9px] font-medium">Upload</span>
+          </label>
+          <input type="file" id="pfp-file-input" accept="image/*" class="hidden" />
+        </div>
+        <div class="space-y-1.5 flex-1 min-w-0">
+          <div class="text-xs font-semibold text-black">Profile Picture (PFP)</div>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btn-trigger-upload" class="px-2.5 py-1 rounded-lg bg-black text-white text-[11px] font-medium shadow-2xs transition-colors cursor-pointer flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs">upload</span>
+              Upload
+            </button>
+            <button type="button" id="btn-reset-pfp" class="px-2.5 py-1 rounded-lg bg-white border border-black/10 text-black/70 text-[11px] font-medium transition-colors cursor-pointer">
+              Default
+            </button>
+          </div>
+          <p class="text-[10px] text-black/40 truncate">Select photo from device</p>
+        </div>
+      </div>
+
+      <!-- Image URL Input -->
+      <div>
+        <label class="block text-xs font-medium text-black/70 mb-1">Or Paste Image URL</label>
+        <input type="url" id="pfp-url-input" placeholder="https://..." class="w-full bg-black/[0.02] border border-black/10 rounded-xl px-3 py-2 text-xs text-black focus:bg-white focus:border-black focus:outline-none transition-colors" />
+      </div>
+
+      <!-- Presets -->
+      <div>
+        <div class="text-[10px] uppercase font-bold tracking-wider text-black/40 mb-2">Preset Avatars</div>
+        <div class="flex items-center gap-2.5 overflow-x-auto pb-1" id="pfp-preset-container">
+          <img class="preset-avatar w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-black cursor-pointer transition-all shrink-0" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Preset 1" />
+          <img class="preset-avatar w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-black cursor-pointer transition-all shrink-0" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" alt="Preset 2" />
+          <img class="preset-avatar w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-black cursor-pointer transition-all shrink-0" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80" alt="Preset 3" />
+          <img class="preset-avatar w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-black cursor-pointer transition-all shrink-0" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80" alt="Preset 4" />
+          <img class="preset-avatar w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-black cursor-pointer transition-all shrink-0" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80" alt="Preset 5" />
+        </div>
+      </div>
+
+      <!-- Name & Role -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-black/70 mb-1">Display Name</label>
+          <input type="text" id="profile-name-input" value="Principal Architect" class="w-full bg-black/[0.02] border border-black/10 rounded-xl px-3 py-2 text-xs text-black focus:bg-white focus:border-black focus:outline-none transition-colors" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-black/70 mb-1">Title / Role</label>
+          <input type="text" id="profile-role-input" value="Enterprise Pro Tier" class="w-full bg-black/[0.02] border border-black/10 rounded-xl px-3 py-2 text-xs text-black focus:bg-white focus:border-black focus:outline-none transition-colors" />
+        </div>
+      </div>
+
+      <div class="pt-2 flex items-center justify-end gap-2 border-t border-black/5">
+        <button type="button" id="btn-cancel-profile" class="px-3.5 py-2 rounded-xl text-black/60 hover:text-black text-xs font-medium cursor-pointer">Cancel</button>
+        <button type="button" id="btn-save-profile" class="px-4 py-2 bg-black text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
 
 </body></html>
