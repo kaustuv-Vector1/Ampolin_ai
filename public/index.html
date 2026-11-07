@@ -294,21 +294,45 @@
 </div>
 <!-- Composer Card (Claude / ChatGPT style floating card) -->
 <div class="w-full mb-6">
-<div class="w-full rounded-2xl bg-white border border-gray-200 composer-shadow transition-all duration-200 p-4">
+<div class="w-full rounded-2xl bg-white border border-gray-200 composer-shadow transition-all duration-200 p-4" id="composer-card">
+
+<!-- Uploaded Vision Image Preview Strip -->
+<div id="vision-preview-container" class="hidden pb-3 mb-3 border-b border-gray-100 flex items-center justify-between animate-in fade-in duration-150">
+  <div class="flex items-center gap-3 min-w-0">
+    <div class="relative group shrink-0">
+      <img id="vision-preview-img" src="" alt="Attached image preview" class="w-14 h-14 object-cover rounded-xl border border-gray-200 shadow-2xs" />
+      <button type="button" id="vision-preview-remove" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-neutral-900 text-white flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer shadow-xs" title="Remove attachment">
+        <span class="material-symbols-outlined text-[13px]">close</span>
+      </button>
+    </div>
+    <div class="min-w-0 space-y-0.5">
+      <div class="flex items-center gap-1.5">
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">VISION READY</span>
+        <span id="vision-preview-name" class="text-xs font-semibold text-neutral-800 truncate max-w-[200px] sm:max-w-xs">image.png</span>
+      </div>
+      <div id="vision-preview-size" class="text-[11px] font-mono text-neutral-400">142 KB • High-res multimodal input</div>
+    </div>
+  </div>
+  <div class="hidden sm:flex items-center text-[11px] text-neutral-400 font-mono">
+    <span>Image loaded</span>
+  </div>
+</div>
+
 <!-- Textarea area -->
 <div class="flex items-start gap-2.5">
 <span class="material-symbols-outlined text-neutral-400 text-lg mt-1 select-none">auto_awesome</span>
 <div class="flex-1 min-w-0">
-<textarea class="w-full bg-transparent resize-none font-sans text-sm md:text-base text-neutral-900 placeholder:text-neutral-400 focus:outline-none leading-relaxed border-none p-0 focus:ring-0" id="composer-input" placeholder="Ask Ampolin anything, drop datasets, or type '/' for agent protocols..." rows="3"></textarea>
+<textarea class="w-full bg-transparent resize-none font-sans text-sm md:text-base text-neutral-900 placeholder:text-neutral-400 focus:outline-none leading-relaxed border-none p-0 focus:ring-0" id="composer-input" placeholder="Ask Ampolin anything, paste screenshots (Ctrl+V), or drag & drop images..." rows="3"></textarea>
 </div>
 </div>
 <!-- Composer Toolbar -->
 <div class="flex flex-wrap items-center justify-between gap-3 pt-3 mt-1 border-t border-neutral-100">
 <!-- Left Controls: Attachment & Toggles -->
 <div class="flex items-center gap-1.5">
-<button class="w-8 h-8 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 flex items-center justify-center transition-colors" title="Attach files or data">
+<button class="w-8 h-8 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 flex items-center justify-center transition-colors cursor-pointer" title="Attach image or screenshot (Ctrl+V / Drag & Drop)" id="attach-file-btn" type="button">
 <span class="material-symbols-outlined text-[19px]">attach_file</span>
 </button>
+<input type="file" id="vision-file-input" accept="image/*" class="hidden" />
 <button class="toolbar-toggle flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 text-neutral-700 hover:bg-neutral-50 transition-all text-xs font-medium" id="web-search-toggle" type="button">
 <span class="material-symbols-outlined text-sm text-neutral-600">public</span>
 <span>Web Search</span>
@@ -438,6 +462,136 @@
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             executeSend();
+          }
+        });
+      }
+
+      // ==========================================
+      // Vision Multimodal Engine & Image Pipeline
+      // ==========================================
+      let activeVisionImage = null; // { data: base64, mimeType: 'image/png', name: '...', size: '...' }
+
+      const attachBtn = document.getElementById('attach-file-btn');
+      const visionFileInput = document.getElementById('vision-file-input');
+      const visionPreviewContainer = document.getElementById('vision-preview-container');
+      const visionPreviewImg = document.getElementById('vision-preview-img');
+      const visionPreviewName = document.getElementById('vision-preview-name');
+      const visionPreviewSize = document.getElementById('vision-preview-size');
+      const visionPreviewRemove = document.getElementById('vision-preview-remove');
+      const composerCard = document.getElementById('composer-card');
+
+      function setVisionPreviewUI(imgObj) {
+        if (!visionPreviewContainer || !visionPreviewImg) return;
+        if (imgObj) {
+          visionPreviewImg.src = imgObj.data;
+          if (visionPreviewName) visionPreviewName.textContent = imgObj.name || 'image.png';
+          if (visionPreviewSize) visionPreviewSize.textContent = `${imgObj.size || ''} • Vision Multimodal Active`;
+          visionPreviewContainer.classList.remove('hidden');
+        } else {
+          visionPreviewImg.src = '';
+          visionPreviewContainer.classList.add('hidden');
+          if (visionFileInput) visionFileInput.value = '';
+        }
+      }
+
+      function clearVisionImage() {
+        activeVisionImage = null;
+        setVisionPreviewUI(null);
+      }
+
+      function handleVisionImageFile(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const rawData = e.target.result;
+          const img = new Image();
+          img.onload = () => {
+            // Intelligent high-res downscaler: max 1920px keeps sharpness for OCR/UI while ensuring sub-second uploads
+            const maxDim = 1920;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+            const optimizedData = canvas.toDataURL(mime, 0.92);
+            const sizeKb = Math.round((optimizedData.length * 0.75) / 1024);
+
+            activeVisionImage = {
+              data: optimizedData,
+              mimeType: mime,
+              name: file.name || 'Pasted-Screenshot.png',
+              size: `${sizeKb} KB`
+            };
+
+            setVisionPreviewUI(activeVisionImage);
+          };
+          img.src = rawData;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      attachBtn?.addEventListener('click', () => {
+        visionFileInput?.click();
+      });
+
+      visionFileInput?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (file) handleVisionImageFile(file);
+      });
+
+      visionPreviewRemove?.addEventListener('click', () => {
+        clearVisionImage();
+      });
+
+      // Direct Clipboard Paste (Ctrl+V / Cmd+V on composer)
+      textarea?.addEventListener('paste', (e) => {
+        const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+        if (!items) return;
+        for (const item of items) {
+          if (item.type.indexOf('image') !== -1) {
+            const blob = item.getAsFile();
+            if (blob) {
+              handleVisionImageFile(blob);
+              break;
+            }
+          }
+        }
+      });
+
+      // Drag and Drop files onto Composer Card
+      if (composerCard) {
+        composerCard.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          composerCard.classList.add('border-neutral-900', 'ring-2', 'ring-neutral-900/10');
+        });
+        composerCard.addEventListener('dragleave', (e) => {
+          e.preventDefault();
+          composerCard.classList.remove('border-neutral-900', 'ring-2', 'ring-neutral-900/10');
+        });
+        composerCard.addEventListener('drop', (e) => {
+          e.preventDefault();
+          composerCard.classList.remove('border-neutral-900', 'ring-2', 'ring-neutral-900/10');
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+            const file = e.dataTransfer.files[0];
+            if (file.type.startsWith('image/')) {
+              handleVisionImageFile(file);
+            }
           }
         });
       }
@@ -586,6 +740,7 @@
 
       function startNewChat() {
         ChatHistoryManager.setActiveId(null);
+        clearVisionImage();
         if (chatFeed) {
           chatFeed.innerHTML = '';
           chatFeed.classList.add('hidden');
@@ -607,6 +762,7 @@
         if (!chat) return;
 
         ChatHistoryManager.setActiveId(id);
+        clearVisionImage();
         const capGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2');
         if (capGrid) capGrid.parentElement.classList.add('hidden');
 
@@ -621,7 +777,12 @@
               const userCard = document.createElement('div');
               userCard.className = 'flex items-start gap-3 justify-end';
               userCard.innerHTML = `
-                <div class="max-w-2xl bg-neutral-900 text-white rounded-2xl p-4 shadow-sm space-y-1">
+                <div class="max-w-2xl bg-neutral-900 text-white rounded-2xl p-4 shadow-sm space-y-2">
+                  ${msg.image && msg.image.data ? `
+                    <div class="rounded-xl overflow-hidden border border-neutral-700/60 max-w-sm mb-2 bg-black/40">
+                      <img src="${escapeHtml(msg.image.data)}" alt="Uploaded visual" class="max-h-64 object-contain rounded-lg w-auto cursor-pointer hover:opacity-95 transition-opacity" onclick="window.open('${escapeHtml(msg.image.data)}', '_blank')" title="Click to open full image" />
+                    </div>
+                  ` : ''}
                   <div class="text-[11px] font-mono text-neutral-400">You</div>
                   <div class="text-sm font-sans whitespace-pre-wrap leading-relaxed">${escapeHtml(msg.content)}</div>
                 </div>
@@ -767,7 +928,11 @@
       async function executeSend() {
         if (!textarea) return;
         const messageText = textarea.value.trim();
-        if (!messageText) return;
+        if (!messageText && !activeVisionImage) return;
+
+        const displayPrompt = messageText || 'Analyze this image in detail and describe what you see, including any text, UI components, architecture, or code.';
+        const attachedImg = activeVisionImage;
+        clearVisionImage();
 
         textarea.value = '';
         textarea.style.height = 'auto';
@@ -782,22 +947,31 @@
         const currentModel = currentModelLabel ? currentModelLabel.textContent.trim() : 'Gemini 3.8 Flash';
         let activeId = ChatHistoryManager.getActiveId();
         if (!activeId) {
-          const newChat = ChatHistoryManager.createChat(messageText, currentModel);
+          const newChat = ChatHistoryManager.createChat(displayPrompt, currentModel);
           activeId = newChat.id;
+          if (attachedImg) {
+            newChat.messages[0].image = attachedImg;
+            ChatHistoryManager.saveAll(ChatHistoryManager.getAll());
+          }
           renderChatHistory();
         } else {
-          ChatHistoryManager.appendMessage(activeId, { role: 'user', content: messageText });
+          ChatHistoryManager.appendMessage(activeId, { role: 'user', content: displayPrompt, image: attachedImg });
           renderChatHistory();
         }
 
-        // Append User Message with User PFP
+        // Append User Message with User PFP and optional Visual
         const userPfp = ProfileManager.getPfp();
         const userCard = document.createElement('div');
         userCard.className = 'flex items-start gap-3 justify-end';
         userCard.innerHTML = `
-          <div class="max-w-2xl bg-neutral-900 text-white rounded-2xl p-4 shadow-sm space-y-1">
+          <div class="max-w-2xl bg-neutral-900 text-white rounded-2xl p-4 shadow-sm space-y-2">
+            ${attachedImg && attachedImg.data ? `
+              <div class="rounded-xl overflow-hidden border border-neutral-700/60 max-w-sm mb-2 bg-black/40">
+                <img src="${escapeHtml(attachedImg.data)}" alt="Uploaded visual" class="max-h-64 object-contain rounded-lg w-auto cursor-pointer hover:opacity-95 transition-opacity" onclick="window.open('${escapeHtml(attachedImg.data)}', '_blank')" title="Click to view full image" />
+              </div>
+            ` : ''}
             <div class="text-[11px] font-mono text-neutral-400">You • Just now</div>
-            <div class="text-sm font-sans whitespace-pre-wrap leading-relaxed">${escapeHtml(messageText)}</div>
+            <div class="text-sm font-sans whitespace-pre-wrap leading-relaxed">${escapeHtml(displayPrompt)}</div>
           </div>
           <img src="${escapeHtml(userPfp)}" alt="Me" class="user-chat-avatar w-8 h-8 rounded-full object-cover shrink-0 border border-neutral-300 shadow-2xs" />
         `;
@@ -815,7 +989,7 @@
               <span class="text-xs font-semibold text-neutral-900">Ampolin AI</span>
               <span class="text-[10px] font-mono text-neutral-400 ai-model-tag flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Thinking with ${escapeHtml(currentModel)}...</span>
+                <span>Thinking with ${escapeHtml(currentModel)}${attachedImg ? ' (Vision)' : ''}...</span>
               </span>
             </div>
             <div class="ai-reply-content text-sm font-sans text-neutral-800 leading-relaxed space-y-2">
@@ -838,6 +1012,11 @@
           try {
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), 12000);
+            const directUserMsg = { role: 'user', content: displayPrompt };
+            if (attachedImg && attachedImg.data) {
+              directUserMsg.images = [attachedImg.data.replace(/^data:image\/[a-z0-9.+]+;base64,/, '')];
+            }
+
             const directRes = await fetch(`${ollamaEndpoint.replace(/\/$/, '')}/api/chat`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -845,7 +1024,7 @@
                 model: ollamaModel,
                 messages: [
                   { role: 'system', content: 'You are Ampolin AI, an elite autonomous software engineering agent.' },
-                  { role: 'user', content: messageText }
+                  directUserMsg
                 ],
                 stream: false
               }),
@@ -873,8 +1052,9 @@
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                message: messageText,
+                message: displayPrompt,
                 model: currentModel,
+                image: attachedImg,
                 ollamaEndpoint: ollamaEndpoint,
                 ollamaModel: ollamaModel
               })
@@ -909,7 +1089,7 @@
               `;
               replyBox.querySelector('.switch-to-qwen-btn')?.addEventListener('click', () => {
                 switchToQwenCloud();
-                textarea.value = messageText;
+                textarea.value = displayPrompt;
                 executeSend();
               });
               replyBox.querySelector('.open-ollama-settings-btn')?.addEventListener('click', openOllamaModal);

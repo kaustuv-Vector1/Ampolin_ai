@@ -164,12 +164,31 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
 <!-- ================= STICKY NATIVE BOTTOM COMPOSER (ChatGPT / Claude / Gemini Style) ================= -->
 <footer class="fixed bottom-0 inset-x-0 z-30 pb-safe bg-gradient-to-t from-[#fcfbf9] via-[#fcfbf9]/95 to-[#fcfbf9]/0 pt-6 px-4">
 <div class="max-w-lg mx-auto w-full">
+
+<!-- Mobile Vision Image Preview Chip -->
+<div id="mobile-vision-preview-container" class="hidden mb-2 bg-white/95 backdrop-blur-md border border-black/10 rounded-2xl p-2 flex items-center justify-between shadow-xs animate-in fade-in duration-150">
+  <div class="flex items-center gap-2.5 min-w-0">
+    <div class="relative shrink-0">
+      <img id="mobile-vision-preview-img" src="" alt="Preview" class="w-10 h-10 object-cover rounded-xl border border-black/10" />
+      <button type="button" id="mobile-vision-preview-remove" class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black text-white flex items-center justify-center text-[10px]" title="Remove">
+        <span class="material-symbols-outlined text-[11px]">close</span>
+      </button>
+    </div>
+    <div class="min-w-0">
+      <div class="text-[11px] font-semibold text-neutral-900 truncate" id="mobile-vision-preview-name">image.png</div>
+      <div class="text-[9.5px] font-mono text-emerald-600 font-medium">Vision Ready • Multimodal</div>
+    </div>
+  </div>
+  <span class="text-[10px] font-mono text-neutral-400 pr-2">Attached</span>
+</div>
+
 <!-- Modern Pill Capsule Input Bar -->
 <div class="relative bg-white rounded-full border border-black/[0.1] shadow-[0_2px_14px_rgba(0,0,0,0.06)] flex items-center px-2 py-1.5 gap-2 transition-all focus-within:border-black/25 focus-within:shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
 <!-- Plus / Attachment Button -->
-<button aria-label="Add attachment" class="w-9 h-9 rounded-full flex items-center justify-center text-black/60 hover:text-black hover:bg-black/5 active:scale-95 transition-all shrink-0" id="attach-btn">
+<button aria-label="Add attachment" class="w-9 h-9 rounded-full flex items-center justify-center text-black/60 hover:text-black hover:bg-black/5 active:scale-95 transition-all shrink-0 cursor-pointer" id="attach-btn" type="button">
 <span class="material-symbols-outlined text-[21px]">add</span>
 </button>
+<input type="file" id="mobile-vision-file-input" accept="image/*" class="hidden" />
 <!-- Message Input -->
 <input autocomplete="off" class="flex-1 bg-transparent border-0 focus:ring-0 text-[15px] text-[#141414] placeholder:text-black/35 py-1 px-1 outline-none font-normal" id="chat-input" placeholder="Ask Ampolin anything..." type="text">
 <!-- Right Action Icons: Web, Dictate/Mic, Send -->
@@ -599,6 +618,7 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
         if (!chat) return;
 
         ChatHistoryManager.setActiveId(id);
+        clearMobileVisionImage();
         if (mobileFeed) {
           mobileFeed.classList.remove('hidden');
           mobileFeed.innerHTML = '';
@@ -615,8 +635,13 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
             const uBubble = document.createElement('div');
             uBubble.className = 'flex items-start gap-2 justify-end';
             uBubble.innerHTML = `
-              <div class="bg-black text-white text-[14px] rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] shadow-xs leading-relaxed whitespace-pre-wrap">
-                ${escapeHtml(msg.content)}
+              <div class="bg-black text-white text-[14px] rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] shadow-xs leading-relaxed whitespace-pre-wrap space-y-1.5">
+                ${msg.image && msg.image.data ? `
+                  <div class="rounded-xl overflow-hidden border border-white/20 max-w-xs mb-1.5 bg-black/40">
+                    <img src="${escapeHtml(msg.image.data)}" alt="Visual" class="max-h-48 object-contain rounded-lg w-auto" onclick="window.open('${escapeHtml(msg.image.data)}', '_blank')" />
+                  </div>
+                ` : ''}
+                <div>${escapeHtml(msg.content)}</div>
               </div>
               <img src="${escapeHtml(userPfp)}" alt="Me" class="mobile-user-chat-avatar w-7 h-7 rounded-full object-cover shrink-0 border border-black/10 mt-0.5" />
             `;
@@ -646,6 +671,7 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
 
       function startMobileNewChat() {
         ChatHistoryManager.setActiveId(null);
+        clearMobileVisionImage();
         if (mobileFeed) {
           mobileFeed.innerHTML = '';
           mobileFeed.classList.add('hidden');
@@ -669,19 +695,103 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
       });
       newChatBtn?.addEventListener('click', startMobileNewChat);
 
+      // Mobile Vision Multimodal Pipeline
+      let activeMobileVisionImage = null;
+      const mobileAttachBtn = document.getElementById('attach-btn');
+      const mobileVisionFileInput = document.getElementById('mobile-vision-file-input');
+      const mobileVisionPreviewContainer = document.getElementById('mobile-vision-preview-container');
+      const mobileVisionPreviewImg = document.getElementById('mobile-vision-preview-img');
+      const mobileVisionPreviewName = document.getElementById('mobile-vision-preview-name');
+      const mobileVisionPreviewRemove = document.getElementById('mobile-vision-preview-remove');
+
+      function setMobileVisionPreviewUI(imgObj) {
+        if (!mobileVisionPreviewContainer || !mobileVisionPreviewImg) return;
+        if (imgObj) {
+          mobileVisionPreviewImg.src = imgObj.data;
+          if (mobileVisionPreviewName) mobileVisionPreviewName.textContent = imgObj.name || 'image.png';
+          mobileVisionPreviewContainer.classList.remove('hidden');
+          updateInputState();
+        } else {
+          mobileVisionPreviewImg.src = '';
+          mobileVisionPreviewContainer.classList.add('hidden');
+          if (mobileVisionFileInput) mobileVisionFileInput.value = '';
+          updateInputState();
+        }
+      }
+
+      function clearMobileVisionImage() {
+        activeMobileVisionImage = null;
+        setMobileVisionPreviewUI(null);
+      }
+
+      function handleMobileVisionImageFile(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const rawData = e.target.result;
+          const img = new Image();
+          img.onload = () => {
+            const maxDim = 1920;
+            let width = img.width;
+            let height = img.height;
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+            const optimizedData = canvas.toDataURL(mime, 0.92);
+            const sizeKb = Math.round((optimizedData.length * 0.75) / 1024);
+
+            activeMobileVisionImage = {
+              data: optimizedData,
+              mimeType: mime,
+              name: file.name || 'Photo.jpg',
+              size: `${sizeKb} KB`
+            };
+            setMobileVisionPreviewUI(activeMobileVisionImage);
+          };
+          img.src = rawData;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      mobileAttachBtn?.addEventListener('click', () => {
+        mobileVisionFileInput?.click();
+      });
+
+      mobileVisionFileInput?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (file) handleMobileVisionImageFile(file);
+      });
+
+      mobileVisionPreviewRemove?.addEventListener('click', () => {
+        clearMobileVisionImage();
+      });
+
       // Input changes toggle Mic vs Send button
       function updateInputState() {
-        const val = chatInput.value.trim();
-        if (val.length > 0) {
-          voiceBtn.classList.add('hidden');
-          voiceBtn.classList.remove('flex');
-          sendBtn.classList.remove('hidden');
-          sendBtn.classList.add('flex');
+        const val = chatInput ? chatInput.value.trim() : '';
+        if (val.length > 0 || activeMobileVisionImage) {
+          voiceBtn?.classList.add('hidden');
+          voiceBtn?.classList.remove('flex');
+          sendBtn?.classList.remove('hidden');
+          sendBtn?.classList.add('flex');
         } else {
-          sendBtn.classList.add('hidden');
-          sendBtn.classList.remove('flex');
-          voiceBtn.classList.remove('hidden');
-          voiceBtn.classList.add('flex');
+          sendBtn?.classList.add('hidden');
+          sendBtn?.classList.remove('flex');
+          voiceBtn?.classList.remove('hidden');
+          voiceBtn?.classList.add('flex');
         }
       }
 
@@ -818,10 +928,14 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
       }
 
       async function executeMobileSend() {
-        const text = chatInput.value.trim();
-        if (!text) return;
+        const text = chatInput ? chatInput.value.trim() : '';
+        if (!text && !activeMobileVisionImage) return;
 
-        chatInput.value = '';
+        const displayPrompt = text || 'Analyze this image in detail and describe what you see, including any text, UI components, architecture, or code.';
+        const attachedImg = activeMobileVisionImage;
+        clearMobileVisionImage();
+
+        if (chatInput) chatInput.value = '';
         updateInputState();
 
         // Show feed, hide starter cards & suggestions
@@ -834,21 +948,30 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
         // Manage Real Chat History Session
         let activeId = ChatHistoryManager.getActiveId();
         if (!activeId) {
-          const newChat = ChatHistoryManager.createChat(text, selectedMobileModel);
+          const newChat = ChatHistoryManager.createChat(displayPrompt, selectedMobileModel);
           activeId = newChat.id;
+          if (attachedImg) {
+            newChat.messages[0].image = attachedImg;
+            ChatHistoryManager.saveAll(ChatHistoryManager.getAll());
+          }
           renderMobileHistory();
         } else {
-          ChatHistoryManager.appendMessage(activeId, { role: 'user', content: text });
+          ChatHistoryManager.appendMessage(activeId, { role: 'user', content: displayPrompt, image: attachedImg });
           renderMobileHistory();
         }
 
-        // User bubble with custom PFP
+        // User bubble with custom PFP and optional Visual
         const userPfp = ProfileManager.getPfp();
         const userBubble = document.createElement('div');
         userBubble.className = 'flex items-start gap-2 justify-end';
         userBubble.innerHTML = `
-          <div class="bg-black text-white text-[14px] rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] shadow-xs leading-relaxed whitespace-pre-wrap">
-            ${escapeHtml(text)}
+          <div class="bg-black text-white text-[14px] rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] shadow-xs leading-relaxed whitespace-pre-wrap space-y-1.5">
+            ${attachedImg && attachedImg.data ? `
+              <div class="rounded-xl overflow-hidden border border-white/20 max-w-xs mb-1.5 bg-black/40">
+                <img src="${escapeHtml(attachedImg.data)}" alt="Visual" class="max-h-48 object-contain rounded-lg w-auto cursor-pointer" onclick="window.open('${escapeHtml(attachedImg.data)}', '_blank')" />
+              </div>
+            ` : ''}
+            <div>${escapeHtml(displayPrompt)}</div>
           </div>
           <img src="${escapeHtml(userPfp)}" alt="Me" class="mobile-user-chat-avatar w-7 h-7 rounded-full object-cover shrink-0 border border-black/10 mt-0.5" />
         `;
@@ -862,7 +985,7 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
           <div class="bg-white border border-black/[0.08] text-[14px] text-neutral-900 rounded-2xl rounded-tl-sm p-3.5 max-w-[85%] shadow-xs space-y-1.5 leading-relaxed">
             <div class="flex items-center gap-1.5 text-[10px] font-mono text-neutral-400">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span class="ai-status">Thinking with ${escapeHtml(selectedMobileModel)}...</span>
+              <span class="ai-status">Thinking with ${escapeHtml(selectedMobileModel)}${attachedImg ? ' (Vision)' : ''}...</span>
             </div>
             <div class="ai-content text-[13.5px]">
               <span class="text-neutral-400">Synthesizing response...</span>
@@ -883,6 +1006,11 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
           try {
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), 10000);
+            const directUserMsg = { role: 'user', content: displayPrompt };
+            if (attachedImg && attachedImg.data) {
+              directUserMsg.images = [attachedImg.data.replace(/^data:image\/[a-z0-9.+]+;base64,/, '')];
+            }
+
             const directRes = await fetch(`${ollamaEndpoint.replace(/\/$/, '')}/api/chat`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -890,7 +1018,7 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
                 model: ollamaModel,
                 messages: [
                   { role: 'system', content: 'You are Ampolin AI, an elite autonomous software engineering agent.' },
-                  { role: 'user', content: text }
+                  directUserMsg
                 ],
                 stream: false
               }),
@@ -916,8 +1044,9 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                message: text,
+                message: displayPrompt,
                 model: selectedMobileModel,
+                image: attachedImg,
                 ollamaEndpoint: ollamaEndpoint,
                 ollamaModel: ollamaModel
               })
