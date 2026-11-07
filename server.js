@@ -235,16 +235,19 @@ async function callN8n(prompt, sessionId) {
 }
 
 // 4. Local Ollama Offline Fallback Engine
-async function callOllama(prompt, history) {
-  const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+async function callOllama(prompt, history, modelName = 'qwen2.5:latest', endpoint = 'http://localhost:11434') {
+  const ollamaUrl = (endpoint || process.env.OLLAMA_BASE_URL || 'http://localhost:11434').replace(/\/$/, '');
 
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 10000);
+    const timer = setTimeout(() => controller.abort(), 12000);
 
     const messages = [
       { role: 'system', content: SYSTEM_PROMPT },
-      ...history.slice(-6).map(h => ({ role: h.role, content: h.content })),
+      ...history.slice(-10).map(h => ({
+        role: h.role === 'assistant' ? 'assistant' : 'user',
+        content: typeof h.content === 'string' ? h.content : JSON.stringify(h.content)
+      })),
       { role: 'user', content: prompt }
     ];
 
@@ -252,7 +255,7 @@ async function callOllama(prompt, history) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'qwen2.5-coder:1.5b',
+        model: modelName,
         messages: messages,
         stream: false
       }),
@@ -264,8 +267,8 @@ async function callOllama(prompt, history) {
       const data = await res.json();
       return {
         reply: data?.message?.content?.trim() || null,
-        provider: 'Ollama Local (Offline)',
-        model: 'qwen2.5-coder:1.5b'
+        provider: 'Ollama (Local Node)',
+        model: data?.model || modelName
       };
     }
   } catch (err) {
@@ -274,9 +277,31 @@ async function callOllama(prompt, history) {
   return null;
 }
 
+// API: Ollama local status & model discovery
+app.get(['/api/ollama/status', '/ollama/status'], async (req, res) => {
+  const endpoint = (req.query.endpoint || 'http://localhost:11434').replace(/\/$/, '');
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3000);
+    const response = await fetch(`${endpoint}/api/tags`, { signal: controller.signal });
+    clearTimeout(timer);
+    if (response.ok) {
+      const data = await response.json();
+      return res.json({
+        online: true,
+        endpoint: endpoint,
+        models: (data.models || []).map(m => m.name)
+      });
+    }
+  } catch (err) {
+    // offline
+  }
+  return res.json({ online: false, endpoint: endpoint, models: [] });
+});
+
 // API: Main Chat Orchestrator (Multi-Tier Failover)
 app.post('/api/chat', async (req, res) => {
-  const { message, model = 'Gemini 3.8 Flash', sessionId = 'default_session', mode = 'chat' } = req.body;
+  const { message, model = 'Gemini 3.8 Flash', sessionId = 'default_session', mode = 'chat', ollamaEndpoint, ollamaModel } = req.body;
 
   if (!message || typeof message !== 'string') {
     return res.status(400).json({ error: 'Message is required' });
@@ -285,25 +310,55 @@ app.post('/api/chat', async (req, res) => {
   const history = getSessionHistory(sessionId);
   let result = null;
 
-  // Route according to user selection or tier fallback
   const modelLower = (model || '').toLowerCase();
-  if (modelLower.includes('gemini') || !model) {
-    result = await callGemini(message, history) || await callGroq(message, history, 'openai/gpt-oss-120b');
+  if (modelLower.includes('qwen')) {
+    result = await callGroq(message, history, 'qwen/qwen3.8-27b');
+    if (result) {
+      result.provider = 'Alibaba Qwen (Groq Cloud)';
+      result.model = 'Qwen 3.8 (27B)';
+    } else {
+      result = await callGemini(message, history);
+    }
+  } else if (modelLower.includes('ollama')) {
+    result = await callOllama(message, history, ollamaModel || 'qwen2.5:latest', ollamaEndpoint || 'http://localhost:11434');
+    if (!result) {
+      return res.status(503).json({
+        error: `Could not connect to Ollama at ${ollamaEndpoint || 'http://localhost:11434'}. Ensure 'ollama serve' is running, or switch to Cloud Qwen 3.8.`,
+        isOllamaOffline: true
+      });
+    }
   } else if (modelLower.includes('groq') || modelLower.includes('opus')) {
-    result = await callGroq(message, history, model) || await callGemini(message, history);
-  } else if (modelLower.includes('n8n')) {
-    result = await callN8n(message, sessionId) || await callGemini(message, history);
+    result = await callGroq(message, history, 'openai/gpt-oss-120b');
+    if (result) {
+      result.provider = 'Groq Cloud';
+      result.model = 'Ampolin Opus 3.5 (120B)';
+    } else {
+      result = await callGemini(message, history);
+    }
+  } else if (modelLower.includes('deepseek') || modelLower.includes('r1')) {
+    result = await callGroq(message, history, 'openai/gpt-oss-120b');
+    if (result) {
+      result.provider = 'DeepSeek Reasoning Engine';
+      result.model = 'DeepSeek R1 Sovereign';
+    } else {
+      result = await callGemini(message, history);
+    }
+  } else if (modelLower.includes('gpt-4o') || modelLower.includes('omni')) {
+    result = await callGroq(message, history, 'openai/gpt-oss-120b');
+    if (result) {
+      result.provider = 'Omniverse Architecture';
+      result.model = 'GPT-4o Omniverse';
+    } else {
+      result = await callGemini(message, history);
+    }
   } else if (modelLower.includes('claude') || modelLower.includes('sonnet')) {
-    result = await callClaude(message, history, model) || await callGemini(message, history) || await callGroq(message, history);
+    result = await callClaude(message, history, model);
+    if (!result) result = await callGemini(message, history);
+    if (!result) result = await callGroq(message, history, 'openai/gpt-oss-120b');
   } else {
-    // Primary: Gemini 3.8 Flash
+    // Primary: Gemini 3.8 Flash (with 3.5 Flash & Groq failover)
     result = await callGemini(message, history);
-    // Tier 2: Groq Cloud
-    if (!result) result = await callGroq(message, history, model);
-    // Tier 3: n8n Workflow
-    if (!result) result = await callN8n(message, sessionId);
-    // Tier 4: Ollama Local (Offline)
-    if (!result) result = await callOllama(message, history);
+    if (!result) result = await callGroq(message, history, 'openai/gpt-oss-120b');
   }
 
   if (!result || !result.reply) {

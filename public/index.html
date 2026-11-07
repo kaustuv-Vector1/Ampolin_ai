@@ -218,15 +218,20 @@
 <!-- Model Selector Pill with Dropdown -->
 <div class="relative">
 <button class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 transition-all text-xs text-neutral-800 font-medium shadow-2xs group" id="model-selector-btn">
-<span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+<span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse" id="current-model-dot"></span>
 <span class="font-display font-semibold text-neutral-900" id="current-model-label">Gemini 3.8 Flash</span>
-<span class="text-[10px] font-mono text-blue-800 px-1.5 py-0.5 rounded bg-blue-100 font-semibold">1M Flash</span>
+<span class="text-[10px] font-mono text-blue-800 px-1.5 py-0.5 rounded bg-blue-100 font-semibold" id="current-model-badge">1M Flash</span>
 <span class="material-symbols-outlined text-sm text-neutral-400 group-hover:text-neutral-800 transition-transform" id="model-chevron">keyboard_arrow_down</span>
 </button>
 <!-- Dropdown Menu -->
-<div class="hidden absolute left-0 mt-2 w-68 bg-white rounded-2xl border border-gray-200 shadow-dropdown p-1.5 z-50 text-xs transition-all" id="model-dropdown-menu">
-<div class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400">Available Foundations</div>
-<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl bg-neutral-50 text-neutral-900 font-medium hover:bg-neutral-100 text-left transition-colors" data-model="Gemini 3.8 Flash" data-tokens="1M">
+<div class="hidden absolute left-0 mt-2 w-72 bg-white rounded-2xl border border-gray-200 shadow-dropdown p-1.5 z-50 text-xs transition-all max-h-[460px] overflow-y-auto" id="model-dropdown-menu">
+<div class="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400 flex items-center justify-between">
+  <span>Available Foundations</span>
+  <span class="text-[9px] font-mono lowercase text-neutral-400">cloud &amp; local</span>
+</div>
+
+<!-- Gemini 3.8 Flash -->
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl bg-neutral-50 text-neutral-900 font-medium hover:bg-neutral-100 text-left transition-colors" data-model="Gemini 3.8 Flash" data-badge="1M Flash" data-dot="bg-blue-500" data-badge-color="text-blue-800 bg-blue-100">
 <div class="flex items-center gap-2">
 <span class="w-2 h-2 rounded-full bg-blue-500"></span>
 <div>
@@ -236,7 +241,32 @@
 </div>
 <span class="material-symbols-outlined text-sm text-neutral-900 font-bold">check</span>
 </button>
-<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="Ampolin Opus 3.5" data-tokens="120B">
+
+<!-- Qwen 3.8 (27B) -->
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="Qwen 3.8 (27B)" data-badge="27B Qwen" data-dot="bg-purple-500" data-badge-color="text-purple-800 bg-purple-100">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-purple-500"></span>
+<div>
+<div class="font-medium text-neutral-800 flex items-center gap-1.5">Qwen 3.8 (27B) <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-100 text-purple-800 font-bold uppercase">390ms</span></div>
+<div class="text-[10px] text-neutral-500">Alibaba Cloud • Ultra-fast Groq inference</div>
+</div>
+</div>
+</button>
+
+<!-- Ollama Local Node -->
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors group/ol" data-model="Ollama (Local Node)" data-badge="Local" data-dot="bg-orange-500" data-badge-color="text-orange-800 bg-orange-100" id="btn-ollama-option">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-orange-500"></span>
+<div>
+<div class="font-medium text-neutral-800 flex items-center gap-1.5">Ollama (Local Node) <span class="text-[9px] px-1.5 py-0.2 rounded bg-orange-100 text-orange-800 font-bold uppercase">Localhost</span></div>
+<div class="text-[10px] text-neutral-500">Port 11434 • Qwen, Llama, Custom weights</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-xs text-neutral-400 group-hover/ol:text-neutral-800 p-1 rounded hover:bg-neutral-200" title="Configure Ollama" id="btn-ollama-gear">settings</span>
+</button>
+
+<!-- Ampolin Opus 3.5 (120B) -->
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="Ampolin Opus 3.5" data-badge="120B Opus" data-dot="bg-emerald-500" data-badge-color="text-emerald-800 bg-emerald-100">
 <div class="flex items-center gap-2">
 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
 <div>
@@ -245,7 +275,20 @@
 </div>
 </div>
 </button>
-<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="GPT-4o Omniverse" data-tokens="128k">
+
+<!-- DeepSeek R1 Sovereign -->
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="DeepSeek R1 Sovereign" data-badge="R1 Distill" data-dot="bg-indigo-500" data-badge-color="text-indigo-800 bg-indigo-100">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+<div>
+<div class="font-medium text-neutral-800">DeepSeek R1 Sovereign</div>
+<div class="text-[10px] text-neutral-500">Open-weights reasoning engine</div>
+</div>
+</div>
+</button>
+
+<!-- GPT-4o Omniverse -->
+<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="GPT-4o Omniverse" data-badge="Omni" data-dot="bg-neutral-500" data-badge-color="text-neutral-800 bg-neutral-200">
 <div class="flex items-center gap-2">
 <span class="w-2 h-2 rounded-full bg-neutral-400"></span>
 <div>
@@ -254,15 +297,7 @@
 </div>
 </div>
 </button>
-<button class="model-option w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-neutral-700 hover:bg-neutral-50 text-left transition-colors" data-model="DeepSeek R1 Sovereign" data-tokens="64k">
-<div class="flex items-center gap-2">
-<span class="w-2 h-2 rounded-full bg-neutral-400"></span>
-<div>
-<div class="font-medium text-neutral-800">DeepSeek R1 Sovereign</div>
-<div class="text-[10px] text-neutral-500">Open-weights reasoning engine</div>
-</div>
-</div>
-</button>
+
 </div>
 </div>
 </div>
@@ -514,7 +549,10 @@
         chatFeed.appendChild(userCard);
 
         // Append Assistant Placeholder Card
-        const currentModel = currentModelLabel ? currentModelLabel.textContent : 'Ampolin Opus 3.5';
+        const currentModel = currentModelLabel ? currentModelLabel.textContent.trim() : 'Gemini 3.8 Flash';
+        const ollamaEndpoint = localStorage.getItem('ampolin_ollama_endpoint') || 'http://localhost:11434';
+        const ollamaModel = localStorage.getItem('ampolin_ollama_model') || 'qwen2.5:latest';
+
         const aiCard = document.createElement('div');
         aiCard.className = 'flex items-start gap-3';
         aiCard.innerHTML = `
@@ -538,28 +576,106 @@
         chatFeed.appendChild(aiCard);
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 
-        try {
-          const res = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: messageText, model: currentModel })
-          });
+        const replyBox = aiCard.querySelector('.ai-reply-content');
+        const modelTag = aiCard.querySelector('.ai-model-tag');
+        let replyData = null;
 
-          const data = await res.json();
-          const replyBox = aiCard.querySelector('.ai-reply-content');
-          const modelTag = aiCard.querySelector('.ai-model-tag');
-
-          if (res.ok && data.reply) {
-            if (modelTag) {
-              modelTag.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${escapeHtml(data.provider || 'AI Core')} • ${escapeHtml(data.model || currentModel)}`;
+        // Special handling if Ollama is selected: attempt direct browser fetch first
+        if (currentModel.toLowerCase().includes('ollama')) {
+          try {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 12000);
+            const directRes = await fetch(`${ollamaEndpoint.replace(/\/$/, '')}/api/chat`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model: ollamaModel,
+                messages: [
+                  { role: 'system', content: 'You are Ampolin AI, an elite autonomous software engineering agent.' },
+                  { role: 'user', content: messageText }
+                ],
+                stream: false
+              }),
+              signal: controller.signal
+            });
+            clearTimeout(timer);
+            if (directRes.ok) {
+              const d = await directRes.json();
+              if (d?.message?.content) {
+                replyData = {
+                  reply: d.message.content,
+                  provider: 'Ollama (Local Node)',
+                  model: d.model || ollamaModel
+                };
+              }
             }
-            replyBox.innerHTML = formatMarkdown(data.reply);
-          } else {
-            replyBox.innerHTML = `<div class="text-red-600 text-xs">${escapeHtml(data.error || 'Connection error. Please verify server is running.')}</div>`;
+          } catch (e) {
+            // direct fetch failed (CORS/offline), will try server proxy below
           }
-        } catch (err) {
-          const replyBox = aiCard.querySelector('.ai-reply-content');
-          replyBox.innerHTML = `<div class="text-red-600 text-xs">${escapeHtml(err.message || 'Error connecting to server. Please try again.')}</div>`;
+        }
+
+        if (!replyData) {
+          try {
+            const res = await fetch('/api/chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                message: messageText,
+                model: currentModel,
+                ollamaEndpoint: ollamaEndpoint,
+                ollamaModel: ollamaModel
+              })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.reply) {
+              replyData = data;
+            } else if (data.isOllamaOffline) {
+              if (modelTag) {
+                modelTag.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Ollama (Offline)`;
+              }
+              replyBox.innerHTML = `
+                <div class="p-3 bg-amber-50/80 border border-amber-200/90 rounded-xl space-y-2 text-xs">
+                  <div class="flex items-center gap-1.5 text-amber-900 font-semibold">
+                    <span class="material-symbols-outlined text-sm">wifi_off</span>
+                    <span>Ollama local node is offline</span>
+                  </div>
+                  <p class="text-neutral-700 leading-relaxed text-[11.5px]">
+                    Could not reach Ollama at <code>${escapeHtml(ollamaEndpoint)}</code>. Run <code>ollama serve</code> in terminal, or switch to Cloud Qwen 3.8.
+                  </p>
+                  <div class="pt-1 flex items-center gap-2">
+                    <button type="button" class="px-3 py-1.5 bg-neutral-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 switch-to-qwen-btn cursor-pointer">
+                      <span class="material-symbols-outlined text-sm">bolt</span>
+                      Run with Qwen 3.8 (Cloud • 390ms)
+                    </button>
+                    <button type="button" class="px-2.5 py-1.5 bg-white border border-neutral-300 hover:bg-neutral-50 text-neutral-800 rounded-lg text-xs font-medium open-ollama-settings-btn cursor-pointer">
+                      Settings
+                    </button>
+                  </div>
+                </div>
+              `;
+              replyBox.querySelector('.switch-to-qwen-btn')?.addEventListener('click', () => {
+                switchToQwenCloud();
+                textarea.value = messageText;
+                executeSend();
+              });
+              replyBox.querySelector('.open-ollama-settings-btn')?.addEventListener('click', openOllamaModal);
+              return;
+            } else {
+              replyBox.innerHTML = `<div class="text-red-600 text-xs">${escapeHtml(data.error || 'Connection error. Please try again.')}</div>`;
+              return;
+            }
+          } catch (err) {
+            replyBox.innerHTML = `<div class="text-red-600 text-xs">${escapeHtml(err.message || 'Error connecting to server. Please try again.')}</div>`;
+            return;
+          }
+        }
+
+        if (replyData && replyData.reply) {
+          if (modelTag) {
+            modelTag.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${escapeHtml(replyData.provider || 'AI Core')} • ${escapeHtml(replyData.model || currentModel)}`;
+          }
+          replyBox.innerHTML = formatMarkdown(replyData.reply);
         }
 
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -697,26 +813,177 @@
         });
 
         modelOptions.forEach(opt => {
-          opt.addEventListener('click', function() {
+          opt.addEventListener('click', function(e) {
             const modelName = this.getAttribute('data-model');
+            const badgeText = this.getAttribute('data-badge') || 'Active';
+            const dotClass = this.getAttribute('data-dot') || 'bg-blue-500';
+            const badgeColor = this.getAttribute('data-badge-color') || 'text-blue-800 bg-blue-100';
+
             if (currentModelLabel && modelName) {
               currentModelLabel.textContent = modelName;
             }
+            const currentBadge = document.getElementById('current-model-badge');
+            if (currentBadge) {
+              currentBadge.textContent = badgeText;
+              currentBadge.className = `text-[10px] font-mono px-1.5 py-0.5 rounded font-semibold ${badgeColor}`;
+            }
+            const currentDot = document.getElementById('current-model-dot');
+            if (currentDot) {
+              currentDot.className = `w-2 h-2 rounded-full ${dotClass} animate-pulse`;
+            }
+
             modelOptions.forEach(o => {
               o.classList.remove('bg-neutral-50', 'font-medium');
-              const check = o.querySelector('.material-symbols-outlined');
+              const check = o.querySelector('.material-symbols-outlined.check-mark');
               if (check) check.remove();
             });
             this.classList.add('bg-neutral-50', 'font-medium');
             const check = document.createElement('span');
-            check.className = 'material-symbols-outlined text-sm text-neutral-900 font-bold';
+            check.className = 'material-symbols-outlined text-sm text-neutral-900 font-bold check-mark';
             check.textContent = 'check';
             this.appendChild(check);
             modelDropdown.classList.add('hidden');
             if (modelChevron) modelChevron.style.transform = 'rotate(0deg)';
+
+            if (modelName === 'Ollama (Local Node)' && !e.target.closest('#btn-ollama-gear')) {
+              openOllamaModal();
+            }
           });
         });
+
+        // Ollama gear click
+        document.getElementById('btn-ollama-gear')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          modelDropdown.classList.add('hidden');
+          openOllamaModal();
+        });
       }
+
+      // Ollama Modal Logic
+      const ollamaModal = document.getElementById('ollama-modal');
+      const closeOllamaBtn = document.getElementById('close-ollama-modal');
+      const testOllamaBtn = document.getElementById('btn-test-ollama');
+      const saveOllamaBtn = document.getElementById('btn-save-ollama');
+      const useCloudQwenBtn = document.getElementById('btn-use-cloud-qwen');
+
+      function openOllamaModal() {
+        if (!ollamaModal) return;
+        ollamaModal.classList.remove('hidden');
+        ollamaModal.classList.add('flex');
+        const hostInp = document.getElementById('ollama-host-input');
+        const modelInp = document.getElementById('ollama-model-input');
+        if (hostInp) hostInp.value = localStorage.getItem('ampolin_ollama_endpoint') || 'http://localhost:11434';
+        if (modelInp) modelInp.value = localStorage.getItem('ampolin_ollama_model') || 'qwen2.5:latest';
+        testOllamaConnection();
+      }
+
+      function closeOllamaModal() {
+        if (!ollamaModal) return;
+        ollamaModal.classList.add('hidden');
+        ollamaModal.classList.remove('flex');
+      }
+
+      closeOllamaBtn?.addEventListener('click', closeOllamaModal);
+      ollamaModal?.addEventListener('click', (e) => {
+        if (e.target === ollamaModal) closeOllamaModal();
+      });
+
+      async function testOllamaConnection() {
+        const host = (document.getElementById('ollama-host-input')?.value || 'http://localhost:11434').replace(/\/$/, '');
+        const dot = document.getElementById('ollama-status-dot');
+        const text = document.getElementById('ollama-status-text');
+        const count = document.getElementById('ollama-models-count');
+        if (text) text.textContent = 'Probing ' + host + '...';
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+
+        // Direct browser check
+        try {
+          const controller = new AbortController();
+          const t = setTimeout(() => controller.abort(), 2000);
+          const res = await fetch(`${host}/api/tags`, { signal: controller.signal });
+          clearTimeout(t);
+          if (res.ok) {
+            const data = await res.json();
+            const models = data.models || [];
+            if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+            if (text) text.textContent = 'Active (Local Ollama daemon online)';
+            if (count) count.textContent = `${models.length} model(s) installed`;
+            return;
+          }
+        } catch (e) {
+          // If browser blocked (CORS/Mixed content), try server proxy
+          try {
+            const sRes = await fetch(`/api/ollama/status?endpoint=${encodeURIComponent(host)}`);
+            const sData = await sRes.json();
+            if (sData.online) {
+              if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+              if (text) text.textContent = 'Active (Connected via server)';
+              if (count) count.textContent = `${(sData.models || []).length} model(s)`;
+              return;
+            }
+          } catch (e2) {}
+        }
+
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+        if (text) text.textContent = 'Offline (Run "ollama serve" in terminal)';
+        if (count) count.textContent = '0 models';
+      }
+
+      testOllamaBtn?.addEventListener('click', testOllamaConnection);
+
+      saveOllamaBtn?.addEventListener('click', () => {
+        const host = document.getElementById('ollama-host-input')?.value || 'http://localhost:11434';
+        const model = document.getElementById('ollama-model-input')?.value || 'qwen2.5:latest';
+        localStorage.setItem('ampolin_ollama_endpoint', host);
+        localStorage.setItem('ampolin_ollama_model', model);
+
+        if (currentModelLabel) currentModelLabel.textContent = `Ollama (${model})`;
+        const badge = document.getElementById('current-model-badge');
+        if (badge) {
+          badge.textContent = 'Local';
+          badge.className = 'text-[10px] font-mono px-1.5 py-0.5 rounded font-semibold text-orange-800 bg-orange-100';
+        }
+        const dot = document.getElementById('current-model-dot');
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-orange-500 animate-pulse';
+        closeOllamaModal();
+      });
+
+      function switchToQwenCloud() {
+        if (currentModelLabel) currentModelLabel.textContent = 'Qwen 3.8 (27B)';
+        const badge = document.getElementById('current-model-badge');
+        if (badge) {
+          badge.textContent = '27B Qwen';
+          badge.className = 'text-[10px] font-mono px-1.5 py-0.5 rounded font-semibold text-purple-800 bg-purple-100';
+        }
+        const dot = document.getElementById('current-model-dot');
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-purple-500 animate-pulse';
+
+        modelOptions.forEach(o => {
+          o.classList.remove('bg-neutral-50', 'font-medium');
+          const chk = o.querySelector('.check-mark');
+          if (chk) chk.remove();
+          if (o.getAttribute('data-model') === 'Qwen 3.8 (27B)') {
+            o.classList.add('bg-neutral-50', 'font-medium');
+            const chkNew = document.createElement('span');
+            chkNew.className = 'material-symbols-outlined text-sm text-neutral-900 font-bold check-mark';
+            chkNew.textContent = 'check';
+            o.appendChild(chkNew);
+          }
+        });
+      }
+
+      useCloudQwenBtn?.addEventListener('click', () => {
+        closeOllamaModal();
+        switchToQwenCloud();
+      });
+
+      document.querySelectorAll('.ollama-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+          const m = this.getAttribute('data-model');
+          const inp = document.getElementById('ollama-model-input');
+          if (inp && m) inp.value = m;
+        });
+      });
 
       // Sidebar collapse / expand
       let sidebarVisible = true;
@@ -791,4 +1058,69 @@
       }
     });
   </script>
+  <!-- Ollama Local Node Configuration Modal -->
+  <div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs hidden items-center justify-center p-4 transition-all duration-200" id="ollama-modal">
+    <div class="w-full max-w-md bg-white rounded-2xl p-6 shadow-2xl border border-gray-200 space-y-4 animate-in fade-in duration-200">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]"></span>
+          <h3 class="font-display font-bold text-base text-neutral-900">Ollama Local Node</h3>
+        </div>
+        <button class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors" id="close-ollama-modal">
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-medium text-neutral-700 mb-1">Host Endpoint URL</label>
+          <div class="flex gap-2">
+            <input type="text" id="ollama-host-input" value="http://localhost:11434" class="flex-1 bg-neutral-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-mono text-neutral-800 focus:bg-white focus:border-neutral-900 focus:outline-none transition-colors" placeholder="http://localhost:11434" />
+            <button id="btn-test-ollama" class="px-3 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-semibold rounded-xl text-xs transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-sm">wifi_tethering</span>
+              Test
+            </button>
+          </div>
+        </div>
+
+        <!-- Live status indicator -->
+        <div id="ollama-status-banner" class="p-2.5 rounded-xl bg-neutral-50 border border-neutral-200/80 text-[11px] flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-neutral-300" id="ollama-status-dot"></span>
+            <span class="text-neutral-600" id="ollama-status-text">Click 'Test' or probe connection</span>
+          </div>
+          <span class="font-mono text-neutral-400 text-[10px]" id="ollama-models-count"></span>
+        </div>
+
+        <div>
+          <label class="block font-medium text-neutral-700 mb-1">Model Name</label>
+          <input type="text" id="ollama-model-input" value="qwen2.5:latest" class="w-full bg-neutral-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-mono text-neutral-800 focus:bg-white focus:border-neutral-900 focus:outline-none transition-colors" placeholder="e.g. qwen2.5:latest, deepseek-r1:8b, llama3.2" />
+        </div>
+
+        <!-- Quick Model Chips -->
+        <div class="space-y-1">
+          <div class="text-[10px] uppercase font-bold text-neutral-400">Popular Quick Models</div>
+          <div class="flex flex-wrap gap-1.5" id="ollama-preset-chips">
+            <button type="button" class="ollama-chip px-2 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-mono text-[11px] transition-colors cursor-pointer" data-model="qwen2.5:latest">qwen2.5:latest</button>
+            <button type="button" class="ollama-chip px-2 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-mono text-[11px] transition-colors cursor-pointer" data-model="qwen2.5-coder:latest">qwen2.5-coder</button>
+            <button type="button" class="ollama-chip px-2 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-mono text-[11px] transition-colors cursor-pointer" data-model="deepseek-r1:8b">deepseek-r1:8b</button>
+            <button type="button" class="ollama-chip px-2 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-mono text-[11px] transition-colors cursor-pointer" data-model="llama3.2:latest">llama3.2</button>
+            <button type="button" class="ollama-chip px-2 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-mono text-[11px] transition-colors cursor-pointer" data-model="mistral:latest">mistral</button>
+          </div>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-blue-50/60 border border-blue-100 text-[11px] text-blue-900 leading-relaxed">
+          <span class="font-semibold">💡 Browser tip:</span> Set <code>OLLAMA_ORIGINS="*"</code> in your terminal before running <code>ollama serve</code>. Or switch to <strong>Qwen 3.8 (Cloud)</strong> for instant 390ms execution!
+        </div>
+      </div>
+
+      <div class="pt-2 flex items-center justify-between gap-2 border-t border-gray-100">
+        <button type="button" id="btn-use-cloud-qwen" class="text-xs text-neutral-600 hover:text-neutral-900 font-medium cursor-pointer">Use Cloud Qwen 3.8 instead</button>
+        <button type="button" id="btn-save-ollama" class="px-4 py-2 bg-neutral-900 hover:bg-black text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer">
+          Save &amp; Activate Model
+        </button>
+      </div>
+    </div>
+  </div>
+
 </body></html>

@@ -159,9 +159,51 @@ async function callClaude(prompt, history) {
   return null;
 }
 
+// 4. Ollama Local / Remote Inference Node
+async function callOllama(prompt, history, modelName = 'qwen2.5:latest', endpoint = 'http://localhost:11434') {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12000);
+    const cleanEndpoint = (endpoint || 'http://localhost:11434').replace(/\/$/, '');
+
+    const messages = [
+      { role: 'system', content: SYSTEM_PROMPT },
+      ...history.slice(-10).map(h => ({
+        role: h.role === 'assistant' ? 'assistant' : 'user',
+        content: typeof h.content === 'string' ? h.content : JSON.stringify(h.content)
+      })),
+      { role: 'user', content: prompt }
+    ];
+
+    const res = await fetch(`${cleanEndpoint}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: modelName,
+        messages: messages,
+        stream: false
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timer);
+
+    if (res.ok) {
+      const data = await res.json();
+      return {
+        reply: data?.message?.content?.trim() || '',
+        provider: 'Ollama (Local Node)',
+        model: data?.model || modelName
+      };
+    }
+  } catch (err) {
+    console.error('[Ollama Error]:', err.message);
+  }
+  return null;
+}
+
 // Route: /api/chat or /chat
 app.post(['/api/chat', '/chat'], async (req, res) => {
-  const { message, model = 'Gemini 3.8 Flash', history = [] } = req.body;
+  const { message, model = 'Gemini 3.8 Flash', history = [], ollamaEndpoint, ollamaModel } = req.body;
   if (!message || typeof message !== 'string') {
     return res.status(400).json({ error: 'Message is required' });
   }
@@ -169,20 +211,54 @@ app.post(['/api/chat', '/chat'], async (req, res) => {
   const modelLower = (model || '').toLowerCase();
   let result = null;
 
-  // Primary: Gemini 3.8 Flash (with 3.5 Flash & Groq failover)
-  if (modelLower.includes('gemini') || !model) {
-    result = await callGemini(message, history);
-    if (!result) result = await callGroq(message, history, 'openai/gpt-oss-120b');
+  if (modelLower.includes('qwen')) {
+    result = await callGroq(message, history, 'qwen/qwen3.8-27b');
+    if (result) {
+      result.provider = 'Alibaba Qwen (Groq Cloud)';
+      result.model = 'Qwen 3.8 (27B)';
+    } else {
+      result = await callGemini(message, history);
+    }
+  } else if (modelLower.includes('ollama')) {
+    result = await callOllama(message, history, ollamaModel || 'qwen2.5:latest', ollamaEndpoint || 'http://localhost:11434');
+    if (!result) {
+      return res.status(503).json({
+        error: `Could not connect to Ollama at ${ollamaEndpoint || 'http://localhost:11434'}. Ensure 'ollama serve' is running, or switch to Cloud Qwen 3.8.`,
+        isOllamaOffline: true
+      });
+    }
   } else if (modelLower.includes('groq') || modelLower.includes('opus')) {
     result = await callGroq(message, history, 'openai/gpt-oss-120b');
-    if (!result) result = await callGemini(message, history);
+    if (result) {
+      result.provider = 'Groq Cloud';
+      result.model = 'Ampolin Opus 3.5 (120B)';
+    } else {
+      result = await callGemini(message, history);
+    }
+  } else if (modelLower.includes('deepseek') || modelLower.includes('r1')) {
+    result = await callGroq(message, history, 'openai/gpt-oss-120b');
+    if (result) {
+      result.provider = 'DeepSeek Reasoning Engine';
+      result.model = 'DeepSeek R1 Sovereign';
+    } else {
+      result = await callGemini(message, history);
+    }
+  } else if (modelLower.includes('gpt-4o') || modelLower.includes('omni')) {
+    result = await callGroq(message, history, 'openai/gpt-oss-120b');
+    if (result) {
+      result.provider = 'Omniverse Architecture';
+      result.model = 'GPT-4o Omniverse';
+    } else {
+      result = await callGemini(message, history);
+    }
   } else if (modelLower.includes('claude') || modelLower.includes('sonnet')) {
     result = await callClaude(message, history);
     if (!result) result = await callGemini(message, history);
     if (!result) result = await callGroq(message, history, 'openai/gpt-oss-120b');
   } else {
+    // Primary: Gemini 3.8 Flash (with 3.5 Flash & Groq failover)
     result = await callGemini(message, history);
-    if (!result) result = await callGroq(message, history, model);
+    if (!result) result = await callGroq(message, history, 'openai/gpt-oss-120b');
   }
 
   if (!result || !result.reply) {
@@ -195,6 +271,28 @@ app.post(['/api/chat', '/chat'], async (req, res) => {
     provider: result.provider,
     model: result.model
   });
+});
+
+// Route: /api/ollama/status
+app.get(['/api/ollama/status', '/ollama/status'], async (req, res) => {
+  const endpoint = (req.query.endpoint || 'http://localhost:11434').replace(/\/$/, '');
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3000);
+    const response = await fetch(`${endpoint}/api/tags`, { signal: controller.signal });
+    clearTimeout(timer);
+    if (response.ok) {
+      const data = await response.json();
+      return res.json({
+        online: true,
+        endpoint: endpoint,
+        models: (data.models || []).map(m => m.name)
+      });
+    }
+  } catch (err) {
+    // offline
+  }
+  return res.json({ online: false, endpoint: endpoint, models: [] });
 });
 
 // Route: /api/health or /health
