@@ -73,6 +73,67 @@
     .composer-shadow:focus-within {
       box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.07), 0 0 0 1px #0d0d0d;
     }
+
+    /* Clean Toolbar Toggle styling (eliminates white-on-white clashes) */
+    .toolbar-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.375rem 0.625rem;
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      transition: all 0.15s ease-in-out;
+      cursor: pointer;
+      border: 1px solid #e5e7eb;
+      background-color: #ffffff;
+      color: #374151;
+      user-select: none;
+    }
+    .toolbar-toggle:hover {
+      background-color: #f3f4f6 !important;
+      color: #111827 !important;
+      border-color: #d1d5db !important;
+    }
+    .toolbar-toggle.is-active {
+      background-color: #171717 !important;
+      color: #ffffff !important;
+      border-color: #171717 !important;
+    }
+    .toolbar-toggle.is-active:hover {
+      background-color: #000000 !important;
+      color: #ffffff !important;
+      border-color: #000000 !important;
+    }
+    .toolbar-toggle.is-active .material-symbols-outlined {
+      color: #ffffff !important;
+    }
+    .toolbar-toggle.is-active .badge-tag {
+      background-color: #262626 !important;
+      color: #d4d4d4 !important;
+      border-color: #404040 !important;
+    }
+
+    /* Mode selector pill hover and active */
+    .mode-pill {
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease-in-out;
+    }
+    .mode-pill:hover:not(.active) {
+      background-color: #f3f4f6 !important;
+      color: #111827 !important;
+      border-color: #d1d5db !important;
+    }
+    .mode-pill.active {
+      background-color: #171717 !important;
+      color: #ffffff !important;
+      border-color: #171717 !important;
+    }
+    .mode-pill.active:hover {
+      background-color: #000000 !important;
+      color: #ffffff !important;
+    }
   </style>
 </head>
 <body class="bg-[#fcfbf9] text-brand-black antialiased selection:bg-brand-black selection:text-white">
@@ -130,9 +191,14 @@
 <span class="text-[10px] text-neutral-500 font-medium truncate" id="sidebar-user-role">Enterprise Pro Tier</span>
 </div>
 </div>
+<div class="flex items-center gap-0.5">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer" title="Lock Studio (⌘L / Ctrl+L)" id="btn-lock-sidebar">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+</button>
 <button class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer" title="Edit Profile & PFP" id="btn-open-profile-settings">
 <span class="material-symbols-outlined text-lg">tune</span>
 </button>
+</div>
 </div>
 </div>
 </aside>
@@ -241,7 +307,10 @@
 <button class="tab-btn px-3 py-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 border-b-2 border-transparent transition-colors" data-tab="system">System</button>
 </nav>
 <div class="h-4 w-px bg-neutral-200 hidden md:block"></div>
-<div class="flex items-center gap-2">
+<div class="flex items-center gap-1.5">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors cursor-pointer" title="Lock Studio (⌘L / Ctrl+L)" id="btn-header-lock">
+  <span class="material-symbols-outlined text-[18px]">lock</span>
+</button>
 <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-neutral-300 bg-white text-xs font-medium text-neutral-700 hover:text-neutral-900 transition-colors shadow-2xs">
 <span class="material-symbols-outlined text-sm">ios_share</span>
 <span>Share</span>
@@ -333,14 +402,14 @@
 <span class="material-symbols-outlined text-[19px]">attach_file</span>
 </button>
 <input type="file" id="vision-file-input" accept="image/*" class="hidden" />
-<button class="toolbar-toggle flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 text-neutral-700 hover:bg-neutral-50 transition-all text-xs font-medium" id="web-search-toggle" type="button">
-<span class="material-symbols-outlined text-sm text-neutral-600">public</span>
+<button class="toolbar-toggle" id="web-search-toggle" type="button" title="Enable Web Grounding">
+<span class="material-symbols-outlined text-[15px]">public</span>
 <span>Web Search</span>
 </button>
-<button class="toolbar-toggle flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-200 text-neutral-700 hover:bg-neutral-50 transition-all text-xs font-medium" id="deep-think-toggle" type="button">
-<span class="material-symbols-outlined text-sm text-neutral-800">bolt</span>
+<button class="toolbar-toggle" id="deep-think-toggle" type="button" title="Enable o3 Deep Thinking (64k reasoning tokens)">
+<span class="material-symbols-outlined text-[15px]">bolt</span>
 <span>o3 Deep Think</span>
-<span class="font-mono text-[10px] text-neutral-500 px-1 py-0.5 rounded bg-neutral-100">64k</span>
+<span class="badge-tag font-mono text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-600 border border-neutral-200">64k</span>
 </button>
 <button class="w-8 h-8 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 flex items-center justify-center transition-colors" title="Voice Input">
 <span class="material-symbols-outlined text-[19px]">mic</span>
@@ -1218,18 +1287,11 @@
         });
       });
 
-      // Web Search & Deep Think Toggles
+      // Web Search & Deep Think Toggles (clean state toggle, never white-on-white)
       [webToggle, thinkToggle].forEach(btn => {
         if (!btn) return;
         btn.addEventListener('click', function() {
-          const isActive = this.classList.contains('bg-neutral-900');
-          if (isActive) {
-            this.classList.remove('bg-neutral-900', 'text-white');
-            this.classList.add('border', 'border-gray-200', 'text-neutral-700', 'bg-white');
-          } else {
-            this.classList.remove('border', 'border-gray-200', 'text-neutral-700', 'bg-white');
-            this.classList.add('bg-neutral-900', 'text-white');
-          }
+          this.classList.toggle('is-active');
         });
       });
 
@@ -1576,6 +1638,108 @@
         }
       });
 
+      // ===============================================
+      // Studio Privacy Lock Screen (ChatGPT / Claude Style)
+      // ===============================================
+      const lockScreen = document.getElementById('studio-lock-screen');
+      const lockAvatar = document.getElementById('lock-screen-avatar');
+      const lockUsername = document.getElementById('lock-screen-username');
+      const lockPinInput = document.getElementById('lock-pin-input');
+      const unlockBtn = document.getElementById('btn-unlock-studio');
+      const lockSidebarBtn = document.getElementById('btn-lock-sidebar');
+      const lockHeaderBtn = document.getElementById('btn-header-lock');
+      const lockHintText = document.getElementById('lock-hint-text');
+      const lockNewChatBtn = document.getElementById('btn-quick-new-chat-lock');
+
+      function getStudioPin() {
+        return localStorage.getItem('ampolin_studio_pin') || '0000';
+      }
+
+      function lockStudio() {
+        if (!lockScreen) return;
+        if (lockAvatar) lockAvatar.src = ProfileManager.getPfp();
+        if (lockUsername) lockUsername.textContent = ProfileManager.getName();
+        if (lockPinInput) {
+          lockPinInput.value = '';
+          setTimeout(() => lockPinInput.focus(), 150);
+        }
+        lockScreen.classList.remove('hidden');
+        lockScreen.classList.add('flex');
+        localStorage.setItem('ampolin_studio_locked', 'true');
+      }
+
+      function unlockStudio() {
+        if (!lockScreen) return;
+        const enteredPin = lockPinInput ? lockPinInput.value.trim() : '';
+        const realPin = getStudioPin();
+
+        // 1-Click unlock if PIN is empty or matches default/stored PIN
+        if (!enteredPin || enteredPin === realPin || enteredPin === '0000') {
+          lockScreen.classList.add('hidden');
+          lockScreen.classList.remove('flex');
+          localStorage.removeItem('ampolin_studio_locked');
+          if (textarea) textarea.focus();
+        } else {
+          if (lockPinInput) {
+            lockPinInput.classList.add('border-red-500', 'bg-red-50');
+            setTimeout(() => lockPinInput.classList.remove('border-red-500', 'bg-red-50'), 1000);
+          }
+          if (lockHintText) {
+            lockHintText.textContent = 'Incorrect PIN. Try 0000 or click Unlock';
+            lockHintText.classList.add('text-red-500');
+            setTimeout(() => {
+              lockHintText.textContent = 'Default PIN: 0000 or click Unlock below';
+              lockHintText.classList.remove('text-red-500');
+            }, 2500);
+          }
+        }
+      }
+
+      lockSidebarBtn?.addEventListener('click', lockStudio);
+      lockHeaderBtn?.addEventListener('click', lockStudio);
+      unlockBtn?.addEventListener('click', unlockStudio);
+      lockPinInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') unlockStudio();
+      });
+      lockNewChatBtn?.addEventListener('click', () => {
+        startNewChat();
+        unlockStudio();
+      });
+
+      // Quick lock shortcut: Cmd+L or Ctrl+L
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'l') {
+          e.preventDefault();
+          if (lockScreen && !lockScreen.classList.contains('hidden')) {
+            unlockStudio();
+          } else {
+            lockStudio();
+          }
+        }
+      });
+
+      // Restore lock state if previously active
+      if (localStorage.getItem('ampolin_studio_locked') === 'true') {
+        lockStudio();
+      }
+
+      // Floating Scroll to Bottom / Scroll Lock pill
+      const scrollBottomBtn = document.getElementById('btn-scroll-bottom');
+      window.addEventListener('scroll', () => {
+        if (!scrollBottomBtn) return;
+        const distFromBottom = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+        if (distFromBottom > 350) {
+          scrollBottomBtn.classList.remove('hidden');
+          scrollBottomBtn.classList.add('flex');
+        } else {
+          scrollBottomBtn.classList.add('hidden');
+          scrollBottomBtn.classList.remove('flex');
+        }
+      });
+      scrollBottomBtn?.addEventListener('click', () => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      });
+
       // Initial Boot: Sync Profile & Render History
       ProfileManager.syncUI();
       renderChatHistory();
@@ -1720,6 +1884,53 @@
         <button type="button" id="btn-save-ollama" class="px-4 py-2 bg-neutral-900 hover:bg-black text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer">
           Save &amp; Activate Model
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Scroll to Bottom / Scroll Lock Pill (ChatGPT / Claude style) -->
+  <button id="btn-scroll-bottom" class="fixed bottom-24 right-8 z-30 hidden items-center gap-1.5 px-3.5 py-2 rounded-full bg-neutral-900 text-white shadow-xl text-xs font-semibold hover:bg-black active:scale-95 transition-all cursor-pointer group" title="Scroll to latest message">
+    <span class="material-symbols-outlined text-[15px] group-hover:translate-y-0.5 transition-transform">arrow_downward</span>
+    <span>Latest</span>
+  </button>
+
+  <!-- Studio Privacy Lock Screen (ChatGPT / Claude Style) -->
+  <div class="fixed inset-0 z-[100] bg-neutral-950/80 backdrop-blur-2xl hidden items-center justify-center p-4 transition-all duration-300" id="studio-lock-screen">
+    <div class="w-full max-w-sm bg-white rounded-3xl p-7 shadow-2xl border border-neutral-200 text-center space-y-5 animate-in zoom-in-95 duration-200">
+      <div class="flex justify-center">
+        <div class="relative">
+          <img id="lock-screen-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Avatar" class="w-20 h-20 rounded-full object-cover border-2 border-neutral-900 shadow-md" />
+          <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center shadow-xs">
+            <span class="material-symbols-outlined text-xs">lock</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-neutral-100 text-[10px] font-mono font-semibold text-neutral-600 uppercase tracking-wider">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          Studio Locked
+        </div>
+        <h3 class="font-display font-bold text-base text-neutral-900" id="lock-screen-username">Principal Architect</h3>
+        <p class="text-xs text-neutral-500 leading-relaxed">Confidential session protected. Unlock to continue chatting.</p>
+      </div>
+
+      <!-- PIN Input or 1-Click Unlock -->
+      <div class="space-y-3 pt-1">
+        <div class="flex justify-center items-center gap-2">
+          <input type="password" maxlength="8" id="lock-pin-input" placeholder="••••" class="w-40 text-center tracking-[0.3em] font-mono text-base font-bold py-2 bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:border-neutral-900 focus:outline-none transition-all placeholder:tracking-normal placeholder:text-neutral-400" />
+        </div>
+        <p class="text-[11px] text-neutral-400 font-mono" id="lock-hint-text">Default PIN: 0000 or click Unlock below</p>
+
+        <button type="button" id="btn-unlock-studio" class="w-full py-2.5 bg-neutral-900 hover:bg-black text-white text-xs font-semibold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">lock_open</span>
+          <span>Unlock Studio</span>
+        </button>
+      </div>
+
+      <div class="pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-400 font-mono">
+        <span>Shortcut: ⌘L / Ctrl+L</span>
+        <button type="button" id="btn-quick-new-chat-lock" class="hover:text-neutral-900 transition-colors cursor-pointer">New chat</button>
       </div>
     </div>
   </div>

@@ -245,15 +245,22 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
 
 <!-- Drawer Footer Profile (Interactive PFP & Name) -->
 <div class="p-3 border-t border-black/[0.06] bg-black/[0.01]">
-<div class="flex items-center justify-between p-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer" id="mobile-btn-user-profile" title="Edit Profile & Avatar">
-<div class="flex items-center gap-2.5 min-w-0">
+<div class="flex items-center justify-between p-1.5 rounded-xl hover:bg-black/5 transition-colors">
+<div class="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer" id="mobile-btn-user-profile" title="Edit Profile & Avatar">
 <img alt="User avatar" id="mobile-user-avatar" class="w-8 h-8 rounded-full border border-black/10 shrink-0 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80">
 <div class="flex flex-col min-w-0">
 <span class="text-[13px] font-semibold text-[#141414] truncate" id="mobile-user-name">Principal Architect</span>
 <span class="text-[11px] text-black/40 truncate" id="mobile-user-role">Enterprise Pro Tier</span>
 </div>
 </div>
-<span class="material-symbols-outlined text-[18px] text-black/40">tune</span>
+<div class="flex items-center gap-1">
+<button type="button" class="p-1.5 rounded-lg text-black/40 hover:text-black hover:bg-black/5 transition-colors cursor-pointer" id="mobile-btn-lock" title="Lock Studio">
+  <span class="material-symbols-outlined text-[18px]">lock</span>
+</button>
+<button type="button" class="p-1.5 rounded-lg text-black/40 hover:text-black hover:bg-black/5 transition-colors cursor-pointer" id="mobile-btn-open-profile" title="Settings">
+  <span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
 </div>
 </div>
 </aside>
@@ -1209,6 +1216,70 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
           executeMobileSend();
         }
       });
+
+      // Studio Privacy Lock Screen (Mobile)
+      const lockScreen = document.getElementById('studio-lock-screen');
+      const lockAvatar = document.getElementById('lock-screen-avatar');
+      const lockUsername = document.getElementById('lock-screen-username');
+      const lockPinInput = document.getElementById('lock-pin-input');
+      const unlockBtn = document.getElementById('btn-unlock-studio');
+      const lockMobileBtn = document.getElementById('mobile-btn-lock');
+      const openProfileSettingBtn = document.getElementById('mobile-btn-open-profile');
+      const lockHintText = document.getElementById('lock-hint-text');
+
+      openProfileSettingBtn?.addEventListener('click', () => {
+        closeDrawer();
+        openProfileModal();
+      });
+
+      function lockStudio() {
+        if (!lockScreen) return;
+        if (lockAvatar) lockAvatar.src = ProfileManager.getPfp();
+        if (lockUsername) lockUsername.textContent = ProfileManager.getName();
+        if (lockPinInput) {
+          lockPinInput.value = '';
+          setTimeout(() => lockPinInput.focus(), 150);
+        }
+        lockScreen.classList.remove('hidden');
+        lockScreen.classList.add('flex');
+        closeDrawer();
+        localStorage.setItem('ampolin_studio_locked', 'true');
+      }
+
+      function unlockStudio() {
+        if (!lockScreen) return;
+        const enteredPin = lockPinInput ? lockPinInput.value.trim() : '';
+        const realPin = localStorage.getItem('ampolin_studio_pin') || '0000';
+
+        if (!enteredPin || enteredPin === realPin || enteredPin === '0000') {
+          lockScreen.classList.add('hidden');
+          lockScreen.classList.remove('flex');
+          localStorage.removeItem('ampolin_studio_locked');
+        } else {
+          if (lockPinInput) {
+            lockPinInput.classList.add('border-red-500', 'bg-red-50');
+            setTimeout(() => lockPinInput.classList.remove('border-red-500', 'bg-red-50'), 1000);
+          }
+          if (lockHintText) {
+            lockHintText.textContent = 'Incorrect PIN. Try 0000';
+            lockHintText.classList.add('text-red-500');
+            setTimeout(() => {
+              lockHintText.textContent = 'PIN: 0000 or tap Unlock';
+              lockHintText.classList.remove('text-red-500');
+            }, 2000);
+          }
+        }
+      }
+
+      lockMobileBtn?.addEventListener('click', lockStudio);
+      unlockBtn?.addEventListener('click', unlockStudio);
+      lockPinInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') unlockStudio();
+      });
+
+      if (localStorage.getItem('ampolin_studio_locked') === 'true') {
+        lockStudio();
+      }
     })();
   </script>
 
@@ -1285,6 +1356,42 @@ Autonomous reasoning, deep technical synthesis, and creative ideation.
         <button type="button" id="btn-cancel-profile" class="px-3.5 py-2 rounded-xl text-black/60 hover:text-black text-xs font-medium cursor-pointer">Cancel</button>
         <button type="button" id="btn-save-profile" class="px-4 py-2 bg-black text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer">
           Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Studio Privacy Lock Screen (ChatGPT / Claude Style) -->
+  <div class="fixed inset-0 z-100 bg-black/80 backdrop-blur-2xl hidden items-center justify-center p-6 transition-all duration-300" id="studio-lock-screen">
+    <div class="w-full max-w-xs bg-white rounded-3xl p-6 shadow-2xl border border-black/10 text-center space-y-4 animate-in zoom-in-95 duration-200">
+      <div class="flex justify-center">
+        <div class="relative">
+          <img id="lock-screen-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Avatar" class="w-18 h-18 rounded-full object-cover border-2 border-black shadow-md" />
+          <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-black text-white flex items-center justify-center shadow-xs">
+            <span class="material-symbols-outlined text-xs">lock</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/5 text-[10px] font-mono font-semibold text-black/70 uppercase tracking-wider">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          Studio Locked
+        </div>
+        <h3 class="font-bold text-base text-black" id="lock-screen-username">Principal Architect</h3>
+        <p class="text-[11.5px] text-black/50 leading-relaxed">Confidential session protected.</p>
+      </div>
+
+      <!-- PIN Input or 1-Click Unlock -->
+      <div class="space-y-2.5 pt-1">
+        <div class="flex justify-center items-center">
+          <input type="password" maxlength="8" id="lock-pin-input" placeholder="••••" class="w-36 text-center tracking-[0.3em] font-mono text-base font-bold py-2 bg-black/[0.03] border border-black/10 rounded-xl focus:bg-white focus:border-black focus:outline-none transition-all placeholder:tracking-normal placeholder:text-black/30" />
+        </div>
+        <p class="text-[10px] text-black/40 font-mono" id="lock-hint-text">PIN: 0000 or tap Unlock</p>
+
+        <button type="button" id="btn-unlock-studio" class="w-full py-2.5 bg-black active:scale-95 text-white text-xs font-semibold rounded-xl shadow-xs transition-transform cursor-pointer flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">lock_open</span>
+          <span>Unlock Studio</span>
         </button>
       </div>
     </div>

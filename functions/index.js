@@ -78,18 +78,26 @@ async function fetchGeminiModel(modelName, timeoutMs, prompt, history, image) {
 async function callGemini(prompt, history, image) {
   if (!GEMINI_KEY) return null;
 
-  // Staggered race across available flash versions:
-  // Try 3.8 Flash first. If it returns 503 (demand spike) or errors out, automatically fallback to 3.6 Flash, 3.5 Flash, or Flash Latest!
-  const candidateModels = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
-  for (const model of candidateModels) {
-    try {
-      const res = await fetchGeminiModel(model, 6500, prompt, history, image);
-      if (res && res.reply) return res;
-    } catch (e) {
-      // try next candidate
-    }
+  // Turbo Multi-Model Parallel Race:
+  // Concurrently race Flash models (3.6 Flash, 3.8 Flash, 3.5 Flash, Flash Latest).
+  // The first model to resolve with valid output wins instantly, completely eliminating 503 / timeout bottlenecks!
+  const raceCandidates = ['gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-flash-latest'];
+  
+  try {
+    const winner = await Promise.any(
+      raceCandidates.map(model => 
+        fetchGeminiModel(model, 5500, prompt, history, image).then(res => {
+          if (res && res.reply) return res;
+          throw new Error(`${model} empty or failed`);
+        })
+      )
+    );
+    if (winner) return winner;
+  } catch (err) {
+    // If all concurrent candidates failed, try backup lite
   }
-  return null;
+
+  return await fetchGeminiModel('gemini-3.1-flash-lite', 4000, prompt, history, image);
 }
 
 // 2. Groq Cloud Engine (Ultra-fast 120B reasoning)
